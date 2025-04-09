@@ -1,3 +1,6 @@
+#ifndef _PROTOCOLS_H_
+#define _PROTOCOLS_H_
+
 #include <unistd.h>
 #include <stdint.h>
 
@@ -56,3 +59,5 @@ struct icmp_hdr
     } frag_t;                        /* Nu este relevant pentru tema */
   } un_t;
 };
+
+#endif

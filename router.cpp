@@ -1,5 +1,5 @@
 #include "protocols.h"
-#include "queue.h"
+// #include "queue.h"
 #include "lib.h"
 
 int main(int argc, char *argv[])
@@ -10,13 +10,16 @@ int main(int argc, char *argv[])
 	init(argv + 2, argc - 2);
 
 
-	while (1) {
+	while (1)
+	{
 
 		size_t interface;
 		size_t len;
 
 		interface = recv_from_any_link(buf, &len);
 		DIE(interface < 0, "recv_from_any_links");
+
+		printf("%zu\n", interface);
 
     // TODO: Implement the router forwarding logic
 
@@ -25,7 +28,5 @@ int main(int argc, char *argv[])
 		host order. For example, ntohs(eth_hdr->ether_type). The oposite is needed when
 		sending a packet on the link, */
 
-
 	}
 }
-

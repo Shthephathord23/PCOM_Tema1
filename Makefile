@@ -1,14 +1,14 @@
 PROJECT=router
-SOURCES=router.c lib/queue.c lib/list.c lib/lib.c
+SOURCES=router.cpp lib/lib.cpp # lib/queue.cpp lib/list.cpp
 LIBRARY=nope
 INCPATHS=include
 LIBPATHS=.
 LDFLAGS=
 CFLAGS=-c -Wall -Werror -Wno-error=unused-variable
-CC=gcc
+CC=g++
 
 # Automatic generation of some important lists
-OBJECTS=$(SOURCES:.c=.o)
+OBJECTS=$(SOURCES:.cpp=.o)
 INCFLAGS=$(foreach TMP,$(INCPATHS),-I$(TMP))
 LIBFLAGS=$(foreach TMP,$(LIBPATHS),-L$(TMP))
 
@@ -20,7 +20,7 @@ all: $(SOURCES) $(BINARY)
 $(BINARY): $(OBJECTS)
 	$(CC) $(LIBFLAGS) $(OBJECTS) $(LDFLAGS) -o $@
 
-.c.o:
+.cpp.o:
 	$(CC) $(INCFLAGS) $(CFLAGS) -fPIC $< -o $@
 
 clean:

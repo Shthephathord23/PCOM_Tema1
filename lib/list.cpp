@@ -3,7 +3,7 @@
 
 list constr(void *element, list l)
 {
-	list temp = malloc(sizeof(struct cell));
+	list temp = (cell *)malloc(sizeof(struct cell));
 	temp->element = element;
 	temp->next = l;
 	return temp;

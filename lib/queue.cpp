@@ -11,7 +11,7 @@ struct queue
 
 queue create_queue(void)
 {
-	queue q = malloc(sizeof(struct queue));
+	queue q = (struct queue*)malloc(sizeof(struct queue));
 	q->head = q->tail = NULL;
 	return q;
 }
