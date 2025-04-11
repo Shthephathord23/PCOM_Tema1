@@ -1,0 +1,10 @@
+Setting up interface: rr-0-1
+Setting up interface: r-0
+Setting up interface: r-1
+router
+800
+Am primit IP packet
+Avem checksum bun
+Destinatia este 192.168.0.2
+Am gasit ruta
+TTL este 63

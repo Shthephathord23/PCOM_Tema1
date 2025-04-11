@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "/root/UPB/PCOM/Tema 1/./checker/checker.py", line 77, in <module>
+    main()
+  File "/root/UPB/PCOM/Tema 1/./checker/checker.py", line 71, in main
+    passive(args.host, args.testname)
+  File "/root/UPB/PCOM/Tema 1/./checker/checker.py", line 38, in passive
+    status = fn(testname, packets)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/root/UPB/PCOM/Tema 1/checker/tests.py", line 470, in host_unreachable_p
+    if ICMP not in packets[1]:
+                   ~~~~~~~^^^
+IndexError: list index out of range
