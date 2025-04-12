@@ -188,25 +188,14 @@ struct arp_packet
 #define get_icmp_payload_len(x) (*get_eth_length(x) - sizeof(ethernet_header) - sizeof(ipv4_header) - sizeof(icmp_header))
 #define MAX_ICMP_PAYLOAD_LEN (MAX_PACKET_LEN - sizeof(ethernet_header) - sizeof(ipv4_header) - sizeof(icmp_header))
 
-#define init_icmp_hdr_echo_reply(__x__, __id__, __seq__)                                       \
-    do                                                                                         \
-    {                                                                                          \
-        icmp_header *hdr = get_icmp_hdr(__x__);                                                \
-        hdr->mtype = ICMP_ECHO_REPLY;                                                          \
-        hdr->mcode = 0;                                                                        \
-        hdr->un_t.echo_t.id = htons(__id__);                                                   \
-        hdr->un_t.echo_t.seq = htons(__seq__);                                                 \
-        hdr->check = 0;                                                                        \
-        hdr->check = htons(checksum(reinterpret_cast<uint16_t *>(hdr), sizeof(icmp_header)));  \
-    } while (0)
-
-#define init_icmp_hdr(__x__, __type__)                                                        \
+#define init_icmp_hdr(__x__, __type__, __id__, __seq__)                                       \
     do                                                                                        \
     {                                                                                         \
         icmp_header *hdr = get_icmp_hdr(__x__);                                               \
         hdr->mtype = __type__;                                                                \
         hdr->mcode = 0;                                                                       \
-        hdr->un_t.gateway_addr = htonl(0);                                                    \
+        hdr->un_t.echo_t.id = __id__;                                                         \
+        hdr->un_t.echo_t.seq = __seq__;                                                       \
         hdr->check = 0;                                                                       \
         hdr->check = htons(checksum(reinterpret_cast<uint16_t *>(hdr), sizeof(icmp_header))); \
     } while (0)

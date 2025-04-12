@@ -64,62 +64,47 @@ void send_ipv4_packet(ipv4_packet* ipv4_packet, bool drop_if_no_route)
 	printf("Am gasit entry in ARP, src = %s dst = %s\n", my_mac_ntoa(get_eth_src_mac(ipv4_packet)), my_mac_ntoa(arp_entry->mac));
 }
 
-void copy_ipv4_in_icmp_payload(ipv4_packet* recieved_packet, icmp_packet* icmp_response)
+void handle_icmp(ipv4_packet* recieved_packet, icmp_packet* icmp_response, size_t length,
+							   uint8_t icmp_type, uint8_t id, uint8_t seq)
 {
 	memset(icmp_response, 0, sizeof(icmp_packet));
-	size_t len = std::min(get_eth_payload_len(recieved_packet), MAX_ICMP_PAYLOAD_LEN);
-	memcpy(get_icmp_payload(icmp_response), get_eth_payload(recieved_packet), len);
+
+	size_t len = std::min(length, MAX_ICMP_PAYLOAD_LEN);
+	if (icmp_type == ICMP_ECHO_REPLY)
+	{
+		memcpy(get_icmp_payload(icmp_response), get_icmp_payload(recieved_packet), len);
+	}
+	else
+	{
+		memcpy(get_icmp_payload(icmp_response), get_eth_payload(recieved_packet), len);
+	}
 	*get_eth_length(icmp_response) = sizeof(ethernet_header) + sizeof(ipv4_header) + sizeof(icmp_header) + len;
+
+	init_icmp_hdr(icmp_response, icmp_type, id, seq);
+
+	init_ipv4_hdr(icmp_response, len + sizeof(ipv4_header) + sizeof(icmp_header),
+				  reinterpret_cast<uint32_t>(inet_addr(get_interface_ip(0))),
+				  *get_ipv4_src_ip(recieved_packet));
+	
+	send_ipv4_packet(reinterpret_cast<ipv4_packet*>(icmp_response), true);
 }
 
 void handle_time_exceeded(ipv4_packet* recieved_packet)
 {
 	icmp_packet icmp_response;
-	memset(&icmp_response, 0, sizeof(icmp_packet));
-
-	size_t len = std::min(get_eth_payload_len(recieved_packet), MAX_ICMP_PAYLOAD_LEN);
-	memcpy(get_icmp_payload(&icmp_response), get_eth_payload(recieved_packet), len);
-	*get_eth_length(&icmp_response) = sizeof(ethernet_header) + sizeof(ipv4_header) + sizeof(icmp_header) + len;
-
-	init_icmp_hdr(&icmp_response, ICMP_TIME_EXCEEDED);
-
-	init_ipv4_hdr(&icmp_response, len + sizeof(ipv4_header) + sizeof(icmp_header), reinterpret_cast<uint32_t>(inet_addr(get_interface_ip(0))), *get_ipv4_src_ip(recieved_packet));
-
-	send_ipv4_packet(reinterpret_cast<ipv4_packet* >(&icmp_response), true);
+	handle_icmp(recieved_packet, &icmp_response, get_eth_payload_len(recieved_packet), ICMP_TIME_EXCEEDED, 0, 0);
 }
 
 void handle_destination_unreachable(ipv4_packet* recieved_packet)
 {
 	icmp_packet icmp_response;
-	memset(&icmp_response, 0, sizeof(icmp_packet));
-
-	size_t len = std::min(get_eth_payload_len(recieved_packet), MAX_ICMP_PAYLOAD_LEN);
-	memcpy(get_icmp_payload(&icmp_response), get_eth_payload(recieved_packet), len);
-	*get_eth_length(&icmp_response) = sizeof(ethernet_header) + sizeof(ipv4_header) + sizeof(icmp_header) + len;
-
-	init_icmp_hdr(&icmp_response, ICMP_DEST_UNREACHABLE);
-
-	init_ipv4_hdr(&icmp_response, len + sizeof(ipv4_header) + sizeof(icmp_header), reinterpret_cast<uint32_t>(inet_addr(get_interface_ip(0))), *get_ipv4_src_ip(recieved_packet));
-
-	send_ipv4_packet(reinterpret_cast<ipv4_packet* >(&icmp_response), true);
+	handle_icmp(recieved_packet, &icmp_response, get_eth_payload_len(recieved_packet), ICMP_DEST_UNREACHABLE, 0, 0);
 }
 
 void handle_echo_reply(ipv4_packet* recieved_packet)
 {
 	icmp_packet icmp_response;
-	memset(&icmp_response, 0, sizeof(icmp_packet));
-
-	size_t len = std::min(get_icmp_payload_len(recieved_packet), MAX_ICMP_PAYLOAD_LEN);
-	memcpy(get_icmp_payload(&icmp_response), get_icmp_payload(recieved_packet), len);
-	*get_eth_length(&icmp_response) = sizeof(ethernet_header) + sizeof(ipv4_header) + sizeof(icmp_header) + len;
-
-	printf("Voi trimite echo reply cu ICMP payload size = %zu si len = %zu\n", len, *get_eth_length(&icmp_response));
-
-	init_icmp_hdr_echo_reply(&icmp_response, get_icmp_hdr(recieved_packet)->un_t.echo_t.id, get_icmp_hdr(recieved_packet)->un_t.echo_t.seq);
-
-	init_ipv4_hdr(&icmp_response, len + sizeof(ipv4_header) + sizeof(icmp_header), reinterpret_cast<uint32_t>(inet_addr(get_interface_ip(0))), *get_ipv4_src_ip(recieved_packet));
-
-	send_ipv4_packet(reinterpret_cast<ipv4_packet* >(&icmp_response), false);
+	handle_icmp(recieved_packet, &icmp_response, get_eth_payload_len(recieved_packet), ICMP_ECHO_REPLY, get_icmp_hdr(recieved_packet)->un_t.echo_t.id, get_icmp_hdr(recieved_packet)->un_t.echo_t.seq);
 }
 
 void handle_ipv4_packet(ipv4_packet* ipv4_packet)
@@ -165,7 +150,7 @@ int main(int argc, char *argv[])
 	// Do not modify this line
 	init(argv + 2, argc - 2);
 
-	// printf("ip i guess %s %s %s\n", get_interface_ip(0), get_interface_ip(1), get_interface_ip(2));
+	printf("ip i guess %s %s %s\n", get_interface_ip(0), get_interface_ip(1), get_interface_ip(2));
 
 	route_table_entry* rtable = (route_table_entry*)malloc(sizeof(route_table_entry) * RTABLE_SIZE);
 	rtable_len = read_rtable(argv[1], rtable);
