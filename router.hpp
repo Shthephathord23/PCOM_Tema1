@@ -9,7 +9,9 @@
 #define ETHER_TYPE_IP 0x0800
 #define ETHER_TYPE_ARP 0x0806
 
+#define ICMP_ECHO_REPLY 0
 #define ICMP_DEST_UNREACHABLE 3
+#define ICMP_ECHO_REQUEST 8
 #define ICMP_TIME_EXCEEDED 11
 
 #define RTABLE_SIZE 80000
@@ -73,6 +75,7 @@ arp_table_entry *get_arp_entry_array(uint32_t ip_dest, std::array<arp_table_entr
 #define get_eth_dest_mac(x) (get_eth_hdr(x)->ethr_dhost)
 #define get_eth_type(x) (&(get_eth_hdr(x)->ethr_type))
 #define get_eth_payload(x) ((char *)(x)->buf + sizeof(ethernet_header))
+#define get_eth_interface(x) (&(x)->interface)
 #define get_eth_length(x) (&((x)->length))
 #define get_eth_payload_len(x) (*get_eth_length(x) - sizeof(ethernet_header))
 #define MAX_ETH_PAYLOAD_LEN (MAX_PACKET_LEN - sizeof(ethernet_header))
@@ -91,6 +94,7 @@ struct ethernet_frame
 #define eth_hdr get_eth_hdr(this)
     char buf[MAX_PACKET_LEN];
     size_t length;
+    size_t interface;
 };
 
 #define get_ipv4_hdr(x) ((ipv4_header *)((char *)(x)->buf + sizeof(ethernet_header)))
@@ -110,7 +114,7 @@ struct ethernet_frame
         hdr->ihl = 5;                                                                            \
         hdr->ver = 4;                                                                            \
         hdr->tos = 0;                                                                            \
-        hdr->tot_len = __tot_len__;                                                              \
+        hdr->tot_len = htons(__tot_len__);                                                       \
         hdr->id = htons(4);                                                                      \
         hdr->frag = htons(0);                                                                    \
         hdr->ttl = 64;                                                                           \
@@ -126,6 +130,7 @@ struct ipv4_packet
 #define ipv4_hdr get_ipv4_hdr(this)
     char buf[MAX_PACKET_LEN];
     size_t length;
+    size_t interface;
 
     inline void calculate_checksum()
     {
@@ -164,9 +169,6 @@ struct ipv4_packet
 
         init_eth_hdr(this, src_mac, arp_entry->mac, ETHER_TYPE_IP);
 
-        // memcpy(eth_hdr->ethr_shost, src_mac, 6);
-        // memcpy(eth_hdr->ethr_dhost, arp_entry->mac, 6);
-
         send_to_link(length, buf, route->interface);
     }
 };
@@ -175,6 +177,7 @@ struct arp_packet
 {
     char buf[MAX_PACKET_LEN];
     size_t length;
+    size_t interface;
 };
 
 #define get_icmp_hdr(x) ((icmp_header *)((char *)(x)->buf + sizeof(ethernet_header) + sizeof(ipv4_header)))
@@ -184,6 +187,18 @@ struct arp_packet
 #define get_icmp_payload(x) ((char *)(x)->buf + sizeof(ethernet_header) + sizeof(ipv4_header) + sizeof(icmp_header))
 #define get_icmp_payload_len(x) (*get_eth_length(x) - sizeof(ethernet_header) - sizeof(ipv4_header) - sizeof(icmp_header))
 #define MAX_ICMP_PAYLOAD_LEN (MAX_PACKET_LEN - sizeof(ethernet_header) - sizeof(ipv4_header) - sizeof(icmp_header))
+
+#define init_icmp_hdr_echo_reply(__x__, __id__, __seq__)                                       \
+    do                                                                                         \
+    {                                                                                          \
+        icmp_header *hdr = get_icmp_hdr(__x__);                                                \
+        hdr->mtype = ICMP_ECHO_REPLY;                                                          \
+        hdr->mcode = 0;                                                                        \
+        hdr->un_t.echo_t.id = htons(__id__);                                                   \
+        hdr->un_t.echo_t.seq = htons(__seq__);                                                 \
+        hdr->check = 0;                                                                        \
+        hdr->check = htons(checksum(reinterpret_cast<uint16_t *>(hdr), sizeof(icmp_header)));  \
+    } while (0)
 
 #define init_icmp_hdr(__x__, __type__)                                                        \
     do                                                                                        \
@@ -201,4 +216,5 @@ struct icmp_packet
 #define icmp_hdr get_icmp_hdr(this)
     char buf[MAX_PACKET_LEN];
     size_t length;
+    size_t interface;
 };

@@ -1,5 +1,10 @@
 #include "router.hpp"
 
+void send_ipv4_packet(ipv4_packet* ipv4_packet, bool drop_if_no_route, bool no_ttl);
+void handle_time_exceeded(ipv4_packet* recieved_packet);
+void handle_destination_unreachable(ipv4_packet* recieved_packet);
+void handle_ipv4_packet(ipv4_packet* ipv4_packet);
+
 std::array<route_table_entry, RTABLE_SIZE> rtable_array;
 size_t rtable_len;
 
@@ -32,18 +37,32 @@ bool cmp(route_table_entry& a, route_table_entry& b)
 	return a.mask > b.mask;
 }
 
-void send_ipv4_packet(ipv4_packet* ipv4_packet, bool drop_if_no_route)
+void send_ipv4_packet(ipv4_packet* ipv4_packet, bool drop_if_no_route, bool no_ttl)
 {
 	printf("Sursa este %s, iar destinatia este %s\n", my_inet_ntoa(*get_ipv4_src_ip(ipv4_packet)), my_inet_ntoa(*get_ipv4_dest_ip(ipv4_packet)));
 	route_table_entry* best_route = get_best_route_array(*get_ipv4_dest_ip(ipv4_packet), rtable_array);
-	if (best_route == NULL)
+	if (best_route == NULL || best_route->next_hop == 0)
 	{
 		printf("Nu am gasit ruta\n");
 		if (drop_if_no_route)
 			return;
+		handle_destination_unreachable(ipv4_packet);
 		return;
 	}
+	printf("%p %s %s %s %s\n", best_route, my_inet_ntoa(best_route->prefix), my_inet_ntoa(best_route->next_hop), my_inet_ntoa(best_route->mask), get_interface_ip(best_route->interface));
 	printf("Am gasit ruta si next-hop este %s\n", my_inet_ntoa(best_route->next_hop));
+
+	if (!no_ttl)
+	{
+		if (!ipv4_packet->is_not_expired())
+		{
+			printf("TTL expired\n");
+			handle_time_exceeded(ipv4_packet);
+			return;
+		}
+		ipv4_packet->calculate_checksum();
+		printf("TTL este %d\n", *get_ipv4_ttl(ipv4_packet));
+	}
 
 	arp_table_entry* arp_entry = get_arp_entry_array(best_route->next_hop, arp_table_array);
 	if (arp_entry == NULL)
@@ -57,12 +76,20 @@ void send_ipv4_packet(ipv4_packet* ipv4_packet, bool drop_if_no_route)
 	printf("Am gasit entry in ARP, src = %s dst = %s\n", my_mac_ntoa(get_eth_src_mac(ipv4_packet)), my_mac_ntoa(arp_entry->mac));
 }
 
+void copy_ipv4_in_icmp_payload(ipv4_packet* recieved_packet, icmp_packet* icmp_response)
+{
+	memset(icmp_response, 0, sizeof(icmp_packet));
+	size_t len = std::min(get_eth_payload_len(recieved_packet), MAX_ICMP_PAYLOAD_LEN);
+	memcpy(get_icmp_payload(icmp_response), get_eth_payload(recieved_packet), len);
+	*get_eth_length(icmp_response) = sizeof(ethernet_header) + sizeof(ipv4_header) + sizeof(icmp_header) + len;
+}
+
 void handle_time_exceeded(ipv4_packet* recieved_packet)
 {
 	icmp_packet icmp_response;
 	memset(&icmp_response, 0, sizeof(icmp_packet));
 
-	size_t len = std::max(get_eth_payload_len(recieved_packet), MAX_ICMP_PAYLOAD_LEN);
+	size_t len = std::min(get_eth_payload_len(recieved_packet), MAX_ICMP_PAYLOAD_LEN);
 	memcpy(get_icmp_payload(&icmp_response), get_eth_payload(recieved_packet), len);
 	*get_eth_length(&icmp_response) = sizeof(ethernet_header) + sizeof(ipv4_header) + sizeof(icmp_header) + len;
 
@@ -70,9 +97,42 @@ void handle_time_exceeded(ipv4_packet* recieved_packet)
 
 	init_ipv4_hdr(&icmp_response, len + sizeof(ipv4_header), 69, *get_ipv4_src_ip(recieved_packet));
 
-	send_ipv4_packet(reinterpret_cast<ipv4_packet* >(&icmp_response), true);
+	send_ipv4_packet(reinterpret_cast<ipv4_packet* >(&icmp_response), true, true);
 }
 
+void handle_destination_unreachable(ipv4_packet* recieved_packet)
+{
+	icmp_packet icmp_response;
+	memset(&icmp_response, 0, sizeof(icmp_packet));
+
+	size_t len = std::min(get_eth_payload_len(recieved_packet), MAX_ICMP_PAYLOAD_LEN);
+	memcpy(get_icmp_payload(&icmp_response), get_eth_payload(recieved_packet), len);
+	*get_eth_length(&icmp_response) = sizeof(ethernet_header) + sizeof(ipv4_header) + sizeof(icmp_header) + len;
+
+	init_icmp_hdr(&icmp_response, ICMP_DEST_UNREACHABLE);
+
+	init_ipv4_hdr(&icmp_response, len + sizeof(ipv4_header), 89, *get_ipv4_src_ip(recieved_packet));
+
+	send_ipv4_packet(reinterpret_cast<ipv4_packet* >(&icmp_response), true, true);
+}
+
+void handle_echo_reply(ipv4_packet* recieved_packet)
+{
+	icmp_packet icmp_response;
+	memset(&icmp_response, 0, sizeof(icmp_packet));
+
+	size_t len = std::min(get_icmp_payload_len(recieved_packet), MAX_ICMP_PAYLOAD_LEN);
+	memcpy(get_icmp_payload(&icmp_response), get_icmp_payload(recieved_packet), len);
+	*get_eth_length(&icmp_response) = sizeof(ethernet_header) + sizeof(ipv4_header) + sizeof(icmp_header) + len;
+
+	printf("Voi trimite echo reply cu ICMP payload size = %zu si len = %zu\n", len, *get_eth_length(&icmp_response));
+
+	init_icmp_hdr_echo_reply(&icmp_response, get_icmp_hdr(recieved_packet)->un_t.echo_t.id, get_icmp_hdr(recieved_packet)->un_t.echo_t.seq);
+
+	init_ipv4_hdr(&icmp_response, len + sizeof(ipv4_header), reinterpret_cast<uint32_t>(inet_addr(get_interface_ip(0))), *get_ipv4_src_ip(recieved_packet));
+
+	send_ipv4_packet(reinterpret_cast<ipv4_packet* >(&icmp_response), false, true);
+}
 
 void handle_ipv4_packet(ipv4_packet* ipv4_packet)
 {
@@ -84,36 +144,21 @@ void handle_ipv4_packet(ipv4_packet* ipv4_packet)
 	}
 	printf("Avem checksum bun\n");
 
-	if (!ipv4_packet->is_not_expired())
+	printf("ip-ul meu %s\n", get_interface_ip(0));
+	if (*get_ipv4_dest_ip(ipv4_packet) ==
+		reinterpret_cast<uint32_t>(inet_addr(get_interface_ip(0)))
+	)
 	{
-		printf("TTL expired\n");
-		handle_time_exceeded(ipv4_packet);
+		printf("Pachetul este pentru mine\n");
+		if (*get_icmp_type(ipv4_packet) == ICMP_ECHO_REQUEST)
+		{
+			printf("Am primit un echo request\n");
+			handle_echo_reply(ipv4_packet);
+		}
 		return;
 	}
-	ipv4_packet->calculate_checksum();
-	printf("TTL este %d\n", *get_ipv4_ttl(ipv4_packet));
 
-	send_ipv4_packet(ipv4_packet, false);
-
-	// printf("Sursa este %s, iar destinatia este %s\n", my_inet_ntoa(*get_ipv4_src_ip(ipv4_packet)), my_inet_ntoa(*get_ipv4_dest_ip(ipv4_packet)));
-	// route_table_entry* best_route = get_best_route_array(*get_ipv4_dest_ip(ipv4_packet), rtable_array);
-	// if (best_route == NULL)
-	// {
-	// 	printf("Nu am gasit ruta\n");
-	// 	return;
-	// }
-	// printf("Am gasit ruta si next-hop este %s\n", my_inet_ntoa(best_route->next_hop));
-
-	// arp_table_entry* arp_entry = get_arp_entry_array(best_route->next_hop, arp_table_array);
-	// if (arp_entry == NULL)
-	// {
-	// 	printf("Nu am gasit entry in ARP\n");
-	// 	return;
-	// }
-
-	// ipv4_packet->send_to_route(best_route, arp_entry);
-
-	// printf("Am gasit entry in ARP, src = %s dst = %s\n", my_mac_ntoa(get_eth_src_mac(ipv4_packet)), my_mac_ntoa(arp_entry->mac));
+	send_ipv4_packet(ipv4_packet, false, false);
 }
 
 int main(int argc, char *argv[])
@@ -122,6 +167,8 @@ int main(int argc, char *argv[])
 
 	// Do not modify this line
 	init(argv + 2, argc - 2);
+
+	// printf("ip i guess %s %s %s\n", get_interface_ip(0), get_interface_ip(1), get_interface_ip(2));
 
 	route_table_entry* rtable = (route_table_entry*)malloc(sizeof(route_table_entry) * RTABLE_SIZE);
 	rtable_len = read_rtable(argv[1], rtable);
@@ -140,17 +187,14 @@ int main(int argc, char *argv[])
 
 	while (1)
 	{
-		size_t interface;
-
-		interface = recv_from_any_link(eth_frame.buf, &eth_frame.length);
-		DIE(interface < 0, "recv_from_any_links");
+		*get_eth_interface(&eth_frame) = recv_from_any_link(eth_frame.buf, &eth_frame.length);
+		DIE(*get_eth_interface(&eth_frame) < 0, "recv_from_any_links");
 
 		printf("\n\nrouter %zu\n", ++cnt);
 
-		ethernet_frame ethernet_frame;
 		uint16_t eth_type = ntohs(*get_eth_type(&eth_frame));
 
-		printf("Am primit frame cu src = %s si dest = %s\nde tip = %x\n", my_mac_ntoa(get_eth_src_mac(&eth_frame)), my_mac_ntoa(get_eth_dest_mac(&eth_frame)), ntohs(*get_eth_type(&eth_frame)));
+		printf("Am primit frame cu src = %s si dest = %s\nde tip = %x si lungime = %zu\n", my_mac_ntoa(get_eth_src_mac(&eth_frame)), my_mac_ntoa(get_eth_dest_mac(&eth_frame)), ntohs(*get_eth_type(&eth_frame)), *get_eth_length(&eth_frame));
 
 		switch (eth_type)
 		{
