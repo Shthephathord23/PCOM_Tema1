@@ -1,0 +1,781 @@
+Setting up interface: rr-0-1
+Setting up interface: r-0
+Setting up interface: r-1
+
+
+router 1
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = ca:fe:ba:be:01:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.0.2, iar destinatia este 192.168.3.2
+Checksum: 94f7 94f7
+Avem checksum bun
+TTL este 62
+Am gasit ruta si next-hop este 192.168.3.2
+Am gasit entry in ARP, src = de:fe:c8:ed:01:03 dst = de:ad:be:ef:00:03
+
+
+router 2
+Am primit frame cu src = de:ad:be:ef:00:03 si dest = ff:ff:ff:ff:ff:ff
+de tip = 608
+Am primit ARP packet
+
+
+router 3
+Am primit frame cu src = de:fe:c8:ed:01:03 si dest = de:ad:be:ef:00:03
+de tip = 608
+Am primit ARP packet
+
+
+router 4
+Am primit frame cu src = de:ad:be:ef:00:03 si dest = de:fe:c8:ed:01:03
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.3.2, iar destinatia este 192.168.0.2
+Checksum: a44b a44b
+Avem checksum bun
+TTL este 63
+Am gasit ruta si next-hop este 192.0.1.1
+Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = ca:fe:ba:be:00:01
+
+
+router 5
+Am primit frame cu src = de:ad:be:ef:00:02 si dest = de:fe:c8:ed:01:02
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.2.2, iar destinatia este 192.168.0.2
+Checksum: 94f7 94f7
+Avem checksum bun
+TTL este 63
+Am gasit ruta si next-hop este 192.0.1.1
+Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = ca:fe:ba:be:00:01
+
+
+router 6
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = ca:fe:ba:be:01:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.0.2, iar destinatia este 192.168.2.2
+Checksum: 70ff 70ff
+Avem checksum bun
+TTL este 62
+Am gasit ruta si next-hop este 192.168.2.2
+Am gasit entry in ARP, src = de:fe:c8:ed:01:02 dst = de:ad:be:ef:00:02
+
+
+router 7
+Am primit frame cu src = de:ad:be:ef:00:02 si dest = de:fe:c8:ed:01:02
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.2.2, iar destinatia este 192.168.1.2
+Checksum: 94f6 94f6
+Avem checksum bun
+TTL este 63
+Am gasit ruta si next-hop este 192.0.1.1
+Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = ca:fe:ba:be:00:01
+
+
+router 8
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = ca:fe:ba:be:01:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.1.2, iar destinatia este 192.168.2.2
+Checksum: 520f 520f
+Avem checksum bun
+TTL este 62
+Am gasit ruta si next-hop este 192.168.2.2
+Am gasit entry in ARP, src = de:fe:c8:ed:01:02 dst = de:ad:be:ef:00:02
+
+
+router 9
+Am primit frame cu src = de:ad:be:ef:00:02 si dest = de:fe:c8:ed:01:02
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.2.2, iar destinatia este 192.168.3.2
+Checksum: 94f4 94f4
+Avem checksum bun
+TTL este 63
+Am gasit ruta si next-hop este 192.168.3.2
+Am gasit entry in ARP, src = de:fe:c8:ed:01:03 dst = de:ad:be:ef:00:03
+
+
+router 10
+Am primit frame cu src = de:ad:be:ef:00:03 si dest = de:fe:c8:ed:01:03
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.3.2, iar destinatia este 192.168.2.2
+Checksum: c1ec c1ec
+Avem checksum bun
+TTL este 63
+Am gasit ruta si next-hop este 192.168.2.2
+Am gasit entry in ARP, src = de:fe:c8:ed:01:02 dst = de:ad:be:ef:00:02
+
+
+router 11
+Am primit frame cu src = de:ad:be:ef:00:03 si dest = de:fe:c8:ed:01:03
+de tip = 608
+Am primit ARP packet
+
+
+router 12
+Am primit frame cu src = de:fe:c8:ed:01:03 si dest = de:ad:be:ef:00:03
+de tip = 608
+Am primit ARP packet
+
+
+router 13
+Am primit frame cu src = de:ad:be:ef:00:03 si dest = de:fe:c8:ed:01:03
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.3.2, iar destinatia este 192.168.1.2
+Checksum: 94f5 94f5
+Avem checksum bun
+TTL este 63
+Am gasit ruta si next-hop este 192.0.1.1
+Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = ca:fe:ba:be:00:01
+
+
+router 14
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = ca:fe:ba:be:01:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.1.2, iar destinatia este 192.168.3.2
+Checksum: 6b67 6b67
+Avem checksum bun
+TTL este 62
+Am gasit ruta si next-hop este 192.168.3.2
+Am gasit entry in ARP, src = de:fe:c8:ed:01:03 dst = de:ad:be:ef:00:03
+
+
+router 15
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = 00:00:00:00:00:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.0.2, iar destinatia este 10.0.0.1
+Checksum: 3eb1 3eb1
+Avem checksum bun
+TTL este 62
+Am gasit ruta si next-hop este 0.0.0.0
+Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = 00:00:00:00:00:00
+
+
+router 16
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = 00:00:00:00:00:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.0.2, iar destinatia este 10.0.0.1
+Checksum: 3eb3 3eb3
+Avem checksum bun
+TTL este 60
+Am gasit ruta si next-hop este 0.0.0.0
+Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = 00:00:00:00:00:00
+
+
+router 17
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = 00:00:00:00:00:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.0.2, iar destinatia este 10.0.0.1
+Checksum: 3eb5 3eb5
+Avem checksum bun
+TTL este 58
+Am gasit ruta si next-hop este 0.0.0.0
+Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = 00:00:00:00:00:00
+
+
+router 18
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = 00:00:00:00:00:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.0.2, iar destinatia este 10.0.0.1
+Checksum: 3eb7 3eb7
+Avem checksum bun
+TTL este 56
+Am gasit ruta si next-hop este 0.0.0.0
+Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = 00:00:00:00:00:00
+
+
+router 19
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = 00:00:00:00:00:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.0.2, iar destinatia este 10.0.0.1
+Checksum: 3eb9 3eb9
+Avem checksum bun
+TTL este 54
+Am gasit ruta si next-hop este 0.0.0.0
+Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = 00:00:00:00:00:00
+
+
+router 20
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = 00:00:00:00:00:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.0.2, iar destinatia este 10.0.0.1
+Checksum: 3ebb 3ebb
+Avem checksum bun
+TTL este 52
+Am gasit ruta si next-hop este 0.0.0.0
+Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = 00:00:00:00:00:00
+
+
+router 21
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = 00:00:00:00:00:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.0.2, iar destinatia este 10.0.0.1
+Checksum: 3ebd 3ebd
+Avem checksum bun
+TTL este 50
+Am gasit ruta si next-hop este 0.0.0.0
+Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = 00:00:00:00:00:00
+
+
+router 22
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = 00:00:00:00:00:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.0.2, iar destinatia este 10.0.0.1
+Checksum: 3ebf 3ebf
+Avem checksum bun
+TTL este 48
+Am gasit ruta si next-hop este 0.0.0.0
+Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = 00:00:00:00:00:00
+
+
+router 23
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = 00:00:00:00:00:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.0.2, iar destinatia este 10.0.0.1
+Checksum: 3ec1 3ec1
+Avem checksum bun
+TTL este 46
+Am gasit ruta si next-hop este 0.0.0.0
+Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = 00:00:00:00:00:00
+
+
+router 24
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = 00:00:00:00:00:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.0.2, iar destinatia este 10.0.0.1
+Checksum: 3ec3 3ec3
+Avem checksum bun
+TTL este 44
+Am gasit ruta si next-hop este 0.0.0.0
+Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = 00:00:00:00:00:00
+
+
+router 25
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = 00:00:00:00:00:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.0.2, iar destinatia este 10.0.0.1
+Checksum: 3ec5 3ec5
+Avem checksum bun
+TTL este 42
+Am gasit ruta si next-hop este 0.0.0.0
+Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = 00:00:00:00:00:00
+
+
+router 26
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = 00:00:00:00:00:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.0.2, iar destinatia este 10.0.0.1
+Checksum: 3ec7 3ec7
+Avem checksum bun
+TTL este 40
+Am gasit ruta si next-hop este 0.0.0.0
+Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = 00:00:00:00:00:00
+
+
+router 27
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = 00:00:00:00:00:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.0.2, iar destinatia este 10.0.0.1
+Checksum: 3ec9 3ec9
+Avem checksum bun
+TTL este 38
+Am gasit ruta si next-hop este 0.0.0.0
+Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = 00:00:00:00:00:00
+
+
+router 28
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = 00:00:00:00:00:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.0.2, iar destinatia este 10.0.0.1
+Checksum: 3ecb 3ecb
+Avem checksum bun
+TTL este 36
+Am gasit ruta si next-hop este 0.0.0.0
+Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = 00:00:00:00:00:00
+
+
+router 29
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = 00:00:00:00:00:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.0.2, iar destinatia este 10.0.0.1
+Checksum: 3ecd 3ecd
+Avem checksum bun
+TTL este 34
+Am gasit ruta si next-hop este 0.0.0.0
+Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = 00:00:00:00:00:00
+
+
+router 30
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = 00:00:00:00:00:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.0.2, iar destinatia este 10.0.0.1
+Checksum: 3ecf 3ecf
+Avem checksum bun
+TTL este 32
+Am gasit ruta si next-hop este 0.0.0.0
+Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = 00:00:00:00:00:00
+
+
+router 31
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = 00:00:00:00:00:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.0.2, iar destinatia este 10.0.0.1
+Checksum: 3ed1 3ed1
+Avem checksum bun
+TTL este 30
+Am gasit ruta si next-hop este 0.0.0.0
+Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = 00:00:00:00:00:00
+
+
+router 32
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = 00:00:00:00:00:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.0.2, iar destinatia este 10.0.0.1
+Checksum: 3ed3 3ed3
+Avem checksum bun
+TTL este 28
+Am gasit ruta si next-hop este 0.0.0.0
+Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = 00:00:00:00:00:00
+
+
+router 33
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = 00:00:00:00:00:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.0.2, iar destinatia este 10.0.0.1
+Checksum: 3ed5 3ed5
+Avem checksum bun
+TTL este 26
+Am gasit ruta si next-hop este 0.0.0.0
+Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = 00:00:00:00:00:00
+
+
+router 34
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = 00:00:00:00:00:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.0.2, iar destinatia este 10.0.0.1
+Checksum: 3ed7 3ed7
+Avem checksum bun
+TTL este 24
+Am gasit ruta si next-hop este 0.0.0.0
+Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = 00:00:00:00:00:00
+
+
+router 35
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = 00:00:00:00:00:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.0.2, iar destinatia este 10.0.0.1
+Checksum: 3ed9 3ed9
+Avem checksum bun
+TTL este 22
+Am gasit ruta si next-hop este 0.0.0.0
+Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = 00:00:00:00:00:00
+
+
+router 36
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = 00:00:00:00:00:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.0.2, iar destinatia este 10.0.0.1
+Checksum: 3edb 3edb
+Avem checksum bun
+TTL este 20
+Am gasit ruta si next-hop este 0.0.0.0
+Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = 00:00:00:00:00:00
+
+
+router 37
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = 00:00:00:00:00:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.0.2, iar destinatia este 10.0.0.1
+Checksum: 3edd 3edd
+Avem checksum bun
+TTL este 18
+Am gasit ruta si next-hop este 0.0.0.0
+Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = 00:00:00:00:00:00
+
+
+router 38
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = 00:00:00:00:00:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.0.2, iar destinatia este 10.0.0.1
+Checksum: 3edf 3edf
+Avem checksum bun
+TTL este 16
+Am gasit ruta si next-hop este 0.0.0.0
+Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = 00:00:00:00:00:00
+
+
+router 39
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = 00:00:00:00:00:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.0.2, iar destinatia este 10.0.0.1
+Checksum: 3ee1 3ee1
+Avem checksum bun
+TTL este 14
+Am gasit ruta si next-hop este 0.0.0.0
+Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = 00:00:00:00:00:00
+
+
+router 40
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = 00:00:00:00:00:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.0.2, iar destinatia este 10.0.0.1
+Checksum: 3ee3 3ee3
+Avem checksum bun
+TTL este 12
+Am gasit ruta si next-hop este 0.0.0.0
+Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = 00:00:00:00:00:00
+
+
+router 41
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = 00:00:00:00:00:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.0.2, iar destinatia este 10.0.0.1
+Checksum: 3ee5 3ee5
+Avem checksum bun
+TTL este 10
+Am gasit ruta si next-hop este 0.0.0.0
+Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = 00:00:00:00:00:00
+
+
+router 42
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = 00:00:00:00:00:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.0.2, iar destinatia este 10.0.0.1
+Checksum: 3ee7 3ee7
+Avem checksum bun
+TTL este 8
+Am gasit ruta si next-hop este 0.0.0.0
+Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = 00:00:00:00:00:00
+
+
+router 43
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = 00:00:00:00:00:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.0.2, iar destinatia este 10.0.0.1
+Checksum: 3ee9 3ee9
+Avem checksum bun
+TTL este 6
+Am gasit ruta si next-hop este 0.0.0.0
+Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = 00:00:00:00:00:00
+
+
+router 44
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = 00:00:00:00:00:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.0.2, iar destinatia este 10.0.0.1
+Checksum: 3eeb 3eeb
+Avem checksum bun
+TTL este 4
+Am gasit ruta si next-hop este 0.0.0.0
+Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = 00:00:00:00:00:00
+
+
+router 45
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = 00:00:00:00:00:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.0.2, iar destinatia este 10.0.0.1
+Checksum: 3eed 3eed
+Avem checksum bun
+TTL este 2
+Am gasit ruta si next-hop este 0.0.0.0
+Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = 00:00:00:00:00:00
+
+
+router 46
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = 00:00:00:00:00:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.0.2, iar destinatia este 10.0.0.1
+Checksum: 3eef 3eef
+Avem checksum bun
+TTL expired
+
+
+router 47
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = ca:fe:ba:be:01:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.0.2, iar destinatia este 192.168.3.2
+Checksum: 8bf7 8bf7
+Avem checksum bun
+TTL este 62
+Am gasit ruta si next-hop este 192.168.3.2
+Am gasit entry in ARP, src = de:fe:c8:ed:01:03 dst = de:ad:be:ef:00:03
+
+
+router 48
+Am primit frame cu src = de:ad:be:ef:00:03 si dest = de:fe:c8:ed:01:03
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.3.2, iar destinatia este 192.168.0.2
+Checksum: e8dc e8dc
+Avem checksum bun
+TTL este 63
+Am gasit ruta si next-hop este 192.0.1.1
+Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = ca:fe:ba:be:00:01
+
+
+router 49
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = ca:fe:ba:be:01:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.0.2, iar destinatia este 192.168.3.2
+Checksum: 8bf7 8bf7
+Avem checksum bun
+TTL este 62
+Am gasit ruta si next-hop este 192.168.3.2
+Am gasit entry in ARP, src = de:fe:c8:ed:01:03 dst = de:ad:be:ef:00:03
+
+
+router 50
+Am primit frame cu src = de:ad:be:ef:00:03 si dest = de:fe:c8:ed:01:03
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.3.2, iar destinatia este 192.168.0.2
+Checksum: e3dc e3dc
+Avem checksum bun
+TTL este 63
+Am gasit ruta si next-hop este 192.0.1.1
+Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = ca:fe:ba:be:00:01
+
+
+router 51
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = ca:fe:ba:be:01:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.0.2, iar destinatia este 192.168.3.2
+Checksum: 8bf7 8bf7
+Avem checksum bun
+TTL este 62
+Am gasit ruta si next-hop este 192.168.3.2
+Am gasit entry in ARP, src = de:fe:c8:ed:01:03 dst = de:ad:be:ef:00:03
+
+
+router 52
+Am primit frame cu src = de:ad:be:ef:00:03 si dest = de:fe:c8:ed:01:03
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.3.2, iar destinatia este 192.168.0.2
+Checksum: e0dc e0dc
+Avem checksum bun
+TTL este 63
+Am gasit ruta si next-hop este 192.0.1.1
+Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = ca:fe:ba:be:00:01
+
+
+router 53
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = ca:fe:ba:be:01:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.0.2, iar destinatia este 192.168.3.2
+Checksum: 8bf7 8bf7
+Avem checksum bun
+TTL este 62
+Am gasit ruta si next-hop este 192.168.3.2
+Am gasit entry in ARP, src = de:fe:c8:ed:01:03 dst = de:ad:be:ef:00:03
+
+
+router 54
+Am primit frame cu src = de:ad:be:ef:00:03 si dest = de:fe:c8:ed:01:03
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.3.2, iar destinatia este 192.168.0.2
+Checksum: dddc dddc
+Avem checksum bun
+TTL este 63
+Am gasit ruta si next-hop este 192.0.1.1
+Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = ca:fe:ba:be:00:01
+
+
+router 55
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = ca:fe:ba:be:01:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.0.2, iar destinatia este 192.168.3.2
+Checksum: 8bf7 8bf7
+Avem checksum bun
+TTL este 62
+Am gasit ruta si next-hop este 192.168.3.2
+Am gasit entry in ARP, src = de:fe:c8:ed:01:03 dst = de:ad:be:ef:00:03
+
+
+router 56
+Am primit frame cu src = de:ad:be:ef:00:03 si dest = de:fe:c8:ed:01:03
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.3.2, iar destinatia este 192.168.0.2
+Checksum: dadc dadc
+Avem checksum bun
+TTL este 63
+Am gasit ruta si next-hop este 192.0.1.1
+Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = ca:fe:ba:be:00:01
+
+
+router 57
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = ca:fe:ba:be:01:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.0.2, iar destinatia este 192.168.3.2
+Checksum: 8bf7 8bf7
+Avem checksum bun
+TTL este 62
+Am gasit ruta si next-hop este 192.168.3.2
+Am gasit entry in ARP, src = de:fe:c8:ed:01:03 dst = de:ad:be:ef:00:03
+
+
+router 58
+Am primit frame cu src = de:ad:be:ef:00:03 si dest = de:fe:c8:ed:01:03
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.3.2, iar destinatia este 192.168.0.2
+Checksum: d2dc d2dc
+Avem checksum bun
+TTL este 63
+Am gasit ruta si next-hop este 192.0.1.1
+Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = ca:fe:ba:be:00:01
+
+
+router 59
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = ca:fe:ba:be:01:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.0.2, iar destinatia este 192.168.3.2
+Checksum: 8bf7 8bf7
+Avem checksum bun
+TTL este 62
+Am gasit ruta si next-hop este 192.168.3.2
+Am gasit entry in ARP, src = de:fe:c8:ed:01:03 dst = de:ad:be:ef:00:03
+
+
+router 60
+Am primit frame cu src = de:ad:be:ef:00:03 si dest = de:fe:c8:ed:01:03
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.3.2, iar destinatia este 192.168.0.2
+Checksum: cbdc cbdc
+Avem checksum bun
+TTL este 63
+Am gasit ruta si next-hop este 192.0.1.1
+Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = ca:fe:ba:be:00:01
+
+
+router 61
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = ca:fe:ba:be:01:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.0.2, iar destinatia este 192.168.3.2
+Checksum: 8bf7 8bf7
+Avem checksum bun
+TTL este 62
+Am gasit ruta si next-hop este 192.168.3.2
+Am gasit entry in ARP, src = de:fe:c8:ed:01:03 dst = de:ad:be:ef:00:03
+
+
+router 62
+Am primit frame cu src = de:ad:be:ef:00:03 si dest = de:fe:c8:ed:01:03
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.3.2, iar destinatia este 192.168.0.2
+Checksum: c9dc c9dc
+Avem checksum bun
+TTL este 63
+Am gasit ruta si next-hop este 192.0.1.1
+Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = ca:fe:ba:be:00:01
+
+
+router 63
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = ca:fe:ba:be:01:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.0.2, iar destinatia este 192.168.3.2
+Checksum: 8bf7 8bf7
+Avem checksum bun
+TTL este 62
+Am gasit ruta si next-hop este 192.168.3.2
+Am gasit entry in ARP, src = de:fe:c8:ed:01:03 dst = de:ad:be:ef:00:03
+
+
+router 64
+Am primit frame cu src = de:ad:be:ef:00:03 si dest = de:fe:c8:ed:01:03
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.3.2, iar destinatia este 192.168.0.2
+Checksum: c5dc c5dc
+Avem checksum bun
+TTL este 63
+Am gasit ruta si next-hop este 192.0.1.1
+Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = ca:fe:ba:be:00:01
+
+
+router 65
+Am primit frame cu src = ca:fe:ba:be:00:01 si dest = ca:fe:ba:be:01:00
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.0.2, iar destinatia este 192.168.3.2
+Checksum: 8bf7 8bf7
+Avem checksum bun
+TTL este 62
+Am gasit ruta si next-hop este 192.168.3.2
+Am gasit entry in ARP, src = de:fe:c8:ed:01:03 dst = de:ad:be:ef:00:03
+
+
+router 66
+Am primit frame cu src = de:ad:be:ef:00:03 si dest = de:fe:c8:ed:01:03
+de tip = 8
+Am primit IP packet
+Sursa este 192.168.3.2, iar destinatia este 192.168.0.2
+Checksum: badc badc
+Avem checksum bun
+TTL este 63
+Am gasit ruta si next-hop este 192.0.1.1
+Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = ca:fe:ba:be:00:01
+
+
+router 67
+Am primit frame cu src = de:ad:be:ef:00:03 si dest = de:fe:c8:ed:01:03
+de tip = 608
+Am primit ARP packet
+
+
+router 68
+Am primit frame cu src = de:fe:c8:ed:01:03 si dest = de:ad:be:ef:00:03
+de tip = 608
+Am primit ARP packet
