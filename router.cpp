@@ -11,6 +11,8 @@ size_t rtable_len;
 std::array<arp_table_entry, ARP_TABLE_SIZE> arp_table_array;
 size_t arp_table_len;
 
+std::unordered_map<uint32_t, uint8_t[6]> arp_table_map;
+
 char* my_inet_ntoa(uint32_t ip)
 {
 	struct in_addr addr;
@@ -83,7 +85,7 @@ void handle_icmp(ipv4_packet* recieved_packet, icmp_packet* icmp_response, size_
 	init_icmp_hdr(icmp_response, icmp_type, id, seq);
 
 	init_ipv4_hdr(icmp_response, len + sizeof(ipv4_header) + sizeof(icmp_header),
-				  reinterpret_cast<uint32_t>(inet_addr(get_interface_ip(0))),
+				  reinterpret_cast<uint32_t>(inet_addr(get_interface_ip(*get_eth_interface(recieved_packet)))),
 				  *get_ipv4_src_ip(recieved_packet));
 	
 	send_ipv4_packet(reinterpret_cast<ipv4_packet*>(icmp_response), true);
@@ -128,7 +130,7 @@ void handle_ipv4_packet(ipv4_packet* ipv4_packet)
 
 	printf("interfata mea este %zu ip-ul meu %s\n", *get_eth_interface(ipv4_packet), get_interface_ip(*get_eth_interface(ipv4_packet)));
 	if (*get_ipv4_dest_ip(ipv4_packet) ==
-		reinterpret_cast<uint32_t>(inet_addr(get_interface_ip(0)))
+		reinterpret_cast<uint32_t>(inet_addr(get_interface_ip(*get_eth_interface(ipv4_packet))))
 	)
 	{
 		printf("Pachetul este pentru mine\n");
