@@ -26,9 +26,9 @@ bool cmp(route_table_entry& a, route_table_entry& b)
 	return a.mask > b.mask;
 }
 
-void handle_time_exceeded(icmp_packet* icmp_packet)
+void handle_time_exceeded(icmp_packet* recieved_packet)
 {
-
+	icmp_packet icmp_response;
 }
 
 void handle_ipv4_packet(ipv4_packet* ipv4_packet,
@@ -38,7 +38,7 @@ void handle_ipv4_packet(ipv4_packet* ipv4_packet,
 					  size_t arp_table_len)
 {
 	printf("Am primit IP packet\n");
-	printf("Sursa este %s, iar destinatia este %s\n", my_inet_ntoa(ipv4_packet->get_src_ip()), my_inet_ntoa(ipv4_packet->get_dest_ip()));
+	printf("Sursa este %s, iar destinatia este %s\n", my_inet_ntoa(*get_ipv4_src_ip(ipv4_packet)), my_inet_ntoa(*get_ipv4_dest_ip(ipv4_packet)));
 	if (!ipv4_packet->is_valid())
 	{
 		printf("Pachet IP invalid, checksum prost\n");
@@ -53,9 +53,9 @@ void handle_ipv4_packet(ipv4_packet* ipv4_packet,
 		return;
 	}
 	ipv4_packet->calculate_checksum();
-	printf("TTL este %d\n", ipv4_packet->get_ttl());
+	printf("TTL este %d\n", *get_ipv4_ttl(ipv4_packet));
 
-	route_table_entry* best_route = get_best_route_array(ipv4_packet->get_dest_ip(), rtable_array);
+	route_table_entry* best_route = get_best_route_array(*get_ipv4_dest_ip(ipv4_packet), rtable_array);
 	if (best_route == NULL)
 	{
 		printf("Nu am gasit ruta\n");
@@ -72,7 +72,7 @@ void handle_ipv4_packet(ipv4_packet* ipv4_packet,
 
 	ipv4_packet->send_to_route(best_route, arp_entry);
 
-	printf("Am gasit entry in ARP, src = %s dst = %s\n", my_mac_ntoa(ipv4_packet->get_src_mac()), my_mac_ntoa(arp_entry->mac));
+	printf("Am gasit entry in ARP, src = %s dst = %s\n", my_mac_ntoa(get_eth_src_mac(ipv4_packet)), my_mac_ntoa(arp_entry->mac));
 }
 
 int main(int argc, char *argv[])
@@ -110,12 +110,12 @@ int main(int argc, char *argv[])
 		printf("\n\nrouter %zu\n", ++cnt);
 
 		ethernet_frame ethernet_frame;
-		uint16_t eth_type = eth_frame.get_ether_type();
+		uint16_t eth_type = ntohs(*get_eth_type(&eth_frame));
 
 		// ether_hdr* eth_header = (ether_hdr *)buf;
 		// void* payload = (void *)(buf + sizeof(ether_hdr));
 
-		printf("Am primit frame cu src = %s si dest = %s\nde tip = %x\n", my_mac_ntoa(eth_frame.get_src_mac()), my_mac_ntoa(eth_frame.get_dest_mac()), ntohs(eth_frame.get_ether_type()));
+		printf("Am primit frame cu src = %s si dest = %s\nde tip = %x\n", my_mac_ntoa(get_eth_src_mac(&eth_frame)), my_mac_ntoa(get_eth_dest_mac(&eth_frame)), ntohs(*get_eth_type(&eth_frame)));
 		// uint16_t l_ether_type = ntohs(eth_header->ethr_type);
 
 		switch (eth_type)
