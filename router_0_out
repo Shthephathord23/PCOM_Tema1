@@ -1,3 +1,138 @@
 Setting up interface: rr-0-1
 Setting up interface: r-0
 Setting up interface: r-1
+
+
+router 1
+Am primit frame cu src = de:ad:be:ef:00:00 si dest = de:fe:c8:ed:00:00
+de tip = 800
+Am primit IP packet
+Avem checksum bun
+Sursa este 192.168.0.2, iar destinatia este 192.168.1.2
+Am gasit ruta si next-hop este 192.168.1.2
+best route:
+	prefix = 192.168.1.0 next_hop = 192.168.1.2 mask = 255.255.255.0 interface = 2
+TTL este 63
+Am gasit entry in ARP, src = de:fe:c8:ed:00:01 dst = de:ad:be:ef:00:01
+
+
+router 2
+Am primit frame cu src = de:ad:be:ef:00:01 si dest = ff:ff:ff:ff:ff:ff
+de tip = 806
+Am primit ARP packet
+Am primit ARP request
+	src_mac = de:ad:be:ef:00:01 src_ip = 192.168.1.2
+	dest_mac = 00:00:00:00:00:00 dest_ip = 192.168.1.1
+
+
+router 3
+Am primit frame cu src = de:fe:c8:ed:00:01 si dest = de:ad:be:ef:00:01
+de tip = 806
+Am primit ARP packet
+Am primit ARP reply
+	src_mac = de:fe:c8:ed:00:01 src_ip = 192.168.1.1
+	dest_mac = de:ad:be:ef:00:01 dest_ip = 192.168.1.2
+
+
+router 4
+Am primit frame cu src = de:ad:be:ef:00:01 si dest = de:fe:c8:ed:00:01
+de tip = 800
+Am primit IP packet
+Avem checksum bun
+Sursa este 192.168.1.2, iar destinatia este 192.168.0.2
+Am gasit ruta si next-hop este 192.168.0.2
+best route:
+	prefix = 192.168.0.0 next_hop = 192.168.0.2 mask = 255.255.255.0 interface = 1
+TTL este 63
+Am gasit entry in ARP, src = de:fe:c8:ed:00:00 dst = de:ad:be:ef:00:00
+
+
+router 5
+Am primit frame cu src = de:ad:be:ef:00:00 si dest = de:fe:c8:ed:00:00
+de tip = 800
+Am primit IP packet
+Avem checksum bun
+Sursa este 192.168.0.2, iar destinatia este 192.168.1.2
+Am gasit ruta si next-hop este 192.168.1.2
+best route:
+	prefix = 192.168.1.0 next_hop = 192.168.1.2 mask = 255.255.255.0 interface = 2
+TTL este 63
+Am gasit entry in ARP, src = de:fe:c8:ed:00:01 dst = de:ad:be:ef:00:01
+
+
+router 6
+Am primit frame cu src = de:ad:be:ef:00:01 si dest = de:fe:c8:ed:00:01
+de tip = 800
+Am primit IP packet
+Avem checksum bun
+Sursa este 192.168.1.2, iar destinatia este 192.168.0.2
+Am gasit ruta si next-hop este 192.168.0.2
+best route:
+	prefix = 192.168.0.0 next_hop = 192.168.0.2 mask = 255.255.255.0 interface = 1
+TTL este 63
+Am gasit entry in ARP, src = de:fe:c8:ed:00:00 dst = de:ad:be:ef:00:00
+
+
+router 7
+Am primit frame cu src = de:ad:be:ef:00:00 si dest = de:fe:c8:ed:00:00
+de tip = 800
+Am primit IP packet
+Avem checksum bun
+Sursa este 192.168.0.2, iar destinatia este 192.168.1.2
+Am gasit ruta si next-hop este 192.168.1.2
+best route:
+	prefix = 192.168.1.0 next_hop = 192.168.1.2 mask = 255.255.255.0 interface = 2
+TTL este 63
+Am gasit entry in ARP, src = de:fe:c8:ed:00:01 dst = de:ad:be:ef:00:01
+
+
+router 8
+Am primit frame cu src = de:ad:be:ef:00:01 si dest = de:fe:c8:ed:00:01
+de tip = 800
+Am primit IP packet
+Avem checksum bun
+Sursa este 192.168.1.2, iar destinatia este 192.168.0.2
+Am gasit ruta si next-hop este 192.168.0.2
+best route:
+	prefix = 192.168.0.0 next_hop = 192.168.0.2 mask = 255.255.255.0 interface = 1
+TTL este 63
+Am gasit entry in ARP, src = de:fe:c8:ed:00:00 dst = de:ad:be:ef:00:00
+
+
+router 9
+Am primit frame cu src = de:ad:be:ef:00:00 si dest = de:fe:c8:ed:00:00
+de tip = 800
+Am primit IP packet
+Avem checksum bun
+Sursa este 192.168.0.2, iar destinatia este 192.168.1.2
+Am gasit ruta si next-hop este 192.168.1.2
+best route:
+	prefix = 192.168.1.0 next_hop = 192.168.1.2 mask = 255.255.255.0 interface = 2
+TTL este 63
+Am gasit entry in ARP, src = de:fe:c8:ed:00:01 dst = de:ad:be:ef:00:01
+
+
+router 10
+Am primit frame cu src = de:ad:be:ef:00:01 si dest = de:fe:c8:ed:00:01
+de tip = 800
+Am primit IP packet
+Avem checksum bun
+Sursa este 192.168.1.2, iar destinatia este 192.168.0.2
+Am gasit ruta si next-hop este 192.168.0.2
+best route:
+	prefix = 192.168.0.0 next_hop = 192.168.0.2 mask = 255.255.255.0 interface = 1
+TTL este 63
+Am gasit entry in ARP, src = de:fe:c8:ed:00:00 dst = de:ad:be:ef:00:00
+
+
+router 11
+Am primit frame cu src = de:ad:be:ef:00:01 si dest = de:fe:c8:ed:00:01
+de tip = 806
+Am primit ARP packet
+Am primit ARP request
+	src_mac = de:ad:be:ef:00:01 src_ip = 192.168.1.2
+	dest_mac = 00:00:00:00:00:00 dest_ip = 192.168.1.1
+
+
+router 12
+Am primit frame cu src = de
