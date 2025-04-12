@@ -95,7 +95,7 @@ void handle_time_exceeded(ipv4_packet* recieved_packet)
 
 	init_icmp_hdr(&icmp_response, ICMP_TIME_EXCEEDED);
 
-	init_ipv4_hdr(&icmp_response, len + sizeof(ipv4_header), 69, *get_ipv4_src_ip(recieved_packet));
+	init_ipv4_hdr(&icmp_response, len + sizeof(ipv4_header) + sizeof(icmp_header), 69, *get_ipv4_src_ip(recieved_packet));
 
 	send_ipv4_packet(reinterpret_cast<ipv4_packet* >(&icmp_response), true, true);
 }
@@ -111,7 +111,7 @@ void handle_destination_unreachable(ipv4_packet* recieved_packet)
 
 	init_icmp_hdr(&icmp_response, ICMP_DEST_UNREACHABLE);
 
-	init_ipv4_hdr(&icmp_response, len + sizeof(ipv4_header), 89, *get_ipv4_src_ip(recieved_packet));
+	init_ipv4_hdr(&icmp_response, len + sizeof(ipv4_header) + sizeof(icmp_header), 89, *get_ipv4_src_ip(recieved_packet));
 
 	send_ipv4_packet(reinterpret_cast<ipv4_packet* >(&icmp_response), true, true);
 }
@@ -129,7 +129,7 @@ void handle_echo_reply(ipv4_packet* recieved_packet)
 
 	init_icmp_hdr_echo_reply(&icmp_response, get_icmp_hdr(recieved_packet)->un_t.echo_t.id, get_icmp_hdr(recieved_packet)->un_t.echo_t.seq);
 
-	init_ipv4_hdr(&icmp_response, len + sizeof(ipv4_header), reinterpret_cast<uint32_t>(inet_addr(get_interface_ip(0))), *get_ipv4_src_ip(recieved_packet));
+	init_ipv4_hdr(&icmp_response, len + sizeof(ipv4_header) + sizeof(icmp_header), reinterpret_cast<uint32_t>(inet_addr(get_interface_ip(0))), *get_ipv4_src_ip(recieved_packet));
 
 	send_ipv4_packet(reinterpret_cast<ipv4_packet* >(&icmp_response), false, true);
 }
