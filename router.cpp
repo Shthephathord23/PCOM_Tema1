@@ -1,6 +1,6 @@
 #include "router.hpp"
 
-void send_ipv4_packet(ipv4_packet* ipv4_packet, bool drop_if_no_route, bool no_ttl);
+void send_ipv4_packet(ipv4_packet* ipv4_packet, bool drop_if_no_route);
 void handle_time_exceeded(ipv4_packet* recieved_packet);
 void handle_destination_unreachable(ipv4_packet* recieved_packet);
 void handle_ipv4_packet(ipv4_packet* ipv4_packet);
@@ -37,7 +37,7 @@ bool cmp(route_table_entry& a, route_table_entry& b)
 	return a.mask > b.mask;
 }
 
-void send_ipv4_packet(ipv4_packet* ipv4_packet, bool drop_if_no_route, bool no_ttl)
+void send_ipv4_packet(ipv4_packet* ipv4_packet, bool drop_if_no_route)
 {
 	printf("Sursa este %s, iar destinatia este %s\n", my_inet_ntoa(*get_ipv4_src_ip(ipv4_packet)), my_inet_ntoa(*get_ipv4_dest_ip(ipv4_packet)));
 	route_table_entry* best_route = get_best_route_array(*get_ipv4_dest_ip(ipv4_packet), rtable_array);
@@ -51,18 +51,6 @@ void send_ipv4_packet(ipv4_packet* ipv4_packet, bool drop_if_no_route, bool no_t
 	}
 	printf("%p %s %s %s %s\n", best_route, my_inet_ntoa(best_route->prefix), my_inet_ntoa(best_route->next_hop), my_inet_ntoa(best_route->mask), get_interface_ip(best_route->interface));
 	printf("Am gasit ruta si next-hop este %s\n", my_inet_ntoa(best_route->next_hop));
-
-	if (!no_ttl)
-	{
-		if (!ipv4_packet->is_not_expired())
-		{
-			printf("TTL expired\n");
-			handle_time_exceeded(ipv4_packet);
-			return;
-		}
-		ipv4_packet->calculate_checksum();
-		printf("TTL este %d\n", *get_ipv4_ttl(ipv4_packet));
-	}
 
 	arp_table_entry* arp_entry = get_arp_entry_array(best_route->next_hop, arp_table_array);
 	if (arp_entry == NULL)
@@ -95,9 +83,9 @@ void handle_time_exceeded(ipv4_packet* recieved_packet)
 
 	init_icmp_hdr(&icmp_response, ICMP_TIME_EXCEEDED);
 
-	init_ipv4_hdr(&icmp_response, len + sizeof(ipv4_header) + sizeof(icmp_header), 69, *get_ipv4_src_ip(recieved_packet));
+	init_ipv4_hdr(&icmp_response, len + sizeof(ipv4_header) + sizeof(icmp_header), reinterpret_cast<uint32_t>(inet_addr(get_interface_ip(0))), *get_ipv4_src_ip(recieved_packet));
 
-	send_ipv4_packet(reinterpret_cast<ipv4_packet* >(&icmp_response), true, true);
+	send_ipv4_packet(reinterpret_cast<ipv4_packet* >(&icmp_response), true);
 }
 
 void handle_destination_unreachable(ipv4_packet* recieved_packet)
@@ -111,9 +99,9 @@ void handle_destination_unreachable(ipv4_packet* recieved_packet)
 
 	init_icmp_hdr(&icmp_response, ICMP_DEST_UNREACHABLE);
 
-	init_ipv4_hdr(&icmp_response, len + sizeof(ipv4_header) + sizeof(icmp_header), 89, *get_ipv4_src_ip(recieved_packet));
+	init_ipv4_hdr(&icmp_response, len + sizeof(ipv4_header) + sizeof(icmp_header), reinterpret_cast<uint32_t>(inet_addr(get_interface_ip(0))), *get_ipv4_src_ip(recieved_packet));
 
-	send_ipv4_packet(reinterpret_cast<ipv4_packet* >(&icmp_response), true, true);
+	send_ipv4_packet(reinterpret_cast<ipv4_packet* >(&icmp_response), true);
 }
 
 void handle_echo_reply(ipv4_packet* recieved_packet)
@@ -131,7 +119,7 @@ void handle_echo_reply(ipv4_packet* recieved_packet)
 
 	init_ipv4_hdr(&icmp_response, len + sizeof(ipv4_header) + sizeof(icmp_header), reinterpret_cast<uint32_t>(inet_addr(get_interface_ip(0))), *get_ipv4_src_ip(recieved_packet));
 
-	send_ipv4_packet(reinterpret_cast<ipv4_packet* >(&icmp_response), false, true);
+	send_ipv4_packet(reinterpret_cast<ipv4_packet* >(&icmp_response), false);
 }
 
 void handle_ipv4_packet(ipv4_packet* ipv4_packet)
@@ -144,7 +132,16 @@ void handle_ipv4_packet(ipv4_packet* ipv4_packet)
 	}
 	printf("Avem checksum bun\n");
 
-	printf("ip-ul meu %s\n", get_interface_ip(0));
+	if (!ipv4_packet->is_not_expired())
+	{
+		printf("TTL expired\n");
+		handle_time_exceeded(ipv4_packet);
+		return;
+	}
+	ipv4_packet->calculate_checksum();
+	printf("TTL este %d\n", *get_ipv4_ttl(ipv4_packet));
+
+	printf("interfata mea este %zu ip-ul meu %s\n", *get_eth_interface(ipv4_packet), get_interface_ip(*get_eth_interface(ipv4_packet)));
 	if (*get_ipv4_dest_ip(ipv4_packet) ==
 		reinterpret_cast<uint32_t>(inet_addr(get_interface_ip(0)))
 	)
@@ -158,7 +155,7 @@ void handle_ipv4_packet(ipv4_packet* ipv4_packet)
 		return;
 	}
 
-	send_ipv4_packet(ipv4_packet, false, false);
+	send_ipv4_packet(ipv4_packet, false);
 }
 
 int main(int argc, char *argv[])
