@@ -1,91 +1,67 @@
-# Router: Trie-Based IP Router Implementation
+# Tema 1 - Data Plane Router
 
-This project implements an efficient IP router that uses a binary trie structure for fast longest prefix matching on IP addresses. The implementation is divided into several modules, `router.cpp`, `router.hpp` `trie.hpp`, which handle core routing logic, packet processing, and network interface interactions.
+Proiectul presupune sa implementez un router IP. In tema sunt trei fisiere mari unde se afla majoritatea codului: `router.cpp`, `router.hpp` si `trie.hpp`. 
+`router.cpp` se ocupa de logica de rutare.
+`router.hpp` defineste toate tipurile de date si macro-urile de care am nevoie
+`trie.hpp` doar implementeaza o trie de care am nevoie pentru longest prefix match in timp mai bun decat liniar. Codul de la trie este reutilizat de la materia SDA din anul I si adaptat putin pentru C++.
+
+Eu am decis sa fac tema in C++ si nu in C, deoarece am incredere mai mare in cum este implementat un `queue` sau un `hash_map` decat implementarile facute de mine la SDA. Totusi nu stiu sa existe `trie` in STL, asa ca am fost nevoit sa il implementez.
 
 ---
 
-## File Structure
+## Structura fisierelor
 
 ### router.cpp
 
-- **Main Routing Loop:**  
-  Continuously listens for incoming Ethernet frames and dispatches them based on type (IP or ARP).
+- **Loop-ul principal:**
+  Ascultam constant dupa frame-uri de Ethernet si le dirijam in functie de tipul lor. In tema avem de implementat doar pachete IP sau ARP.
+
+- **Initializarea tabelului de rutare si a triei:**  
+  - Citim tabelul de rutare cu functia din schelet `read_rtable()`.
+  - Construim tria(imi pare rau daca `tria` nu este corect gramatical) din tabelul de rutare folosind `build_trie()` din `trie.hpp`.
+  - Dam update la pointer-ul global `trie_root` care este un pointer catre o trie ce se calculeaza pe baza tabelului din `read_rtable()`.
+
+- **Procesarea de pachete:**  
+  - **IPv4:**  
+    - Verificam header-ul pachetului pentru corectitudine (checksum si TTL).
+    - Verificam daca pachetul este destinat noua (din pespectiva router-ului noi = router) sau daca ii dam forward mai departe.
+    - Folosim `lookup(trie_root, dest_ip)` ca sa gasim cea mai buna (in sensul longest prefix match) ruta din trie.
+    - Daca exista macar o ruta, ne uitam in tabela de arp si daca exista ip-ul next-hop-ului trimitem mai departe, altfel rezolvam si trimitem mai tarziu.
+    - Trimitem mesaje ICMP cand apar erori (de pilda Time Excedeed sau unreachable host).
   
-- **Routing Table and Trie Initialization:**  
-  - Loads the routing table using `read_rtable()`.
-  - Uses `build_trie()` (defined in `trie.hpp`) to construct the trie from the routing table entries.
-  - Sets the global trie pointer `trie_root` for use during lookups.
-  
-- **Packet Processing:**  
-  - **IPv4 Packets:**  
-    - Validates packet headers (checksum and TTL).
-    - Determines if the packet is destined for the router or needs forwarding.
-    - Calls `lookup(trie_root, dest_ip)` to find the best route.
-    - If a route is found, performs ARP resolution if necessary before forwarding.
-    - Handles ICMP messages for error reporting (e.g., Time Exceeded, Destination Unreachable, Echo Reply).
-  - **ARP Packets:**  
-    - Processes ARP requests and replies.
-    - Updates the ARP table (stored in a hash map) and triggers waiting packet queues if needed.
-  
-- **Auxiliary Functions:**  
-  Functions like `send_ipv4_packet()`, `handle_ipv4_packet()`, and various ARP handlers encapsulate the logic for building and sending network packets according to routing decisions.
+  - **ARP:**  
+    - Procesam ARP request-uri si ARP reply-uri.
+    - Dam update la hashmap-ul care reprezinta memoria permanenta pentru arp table si dam handle la pachete in queue care asteapta pentru un ARP reply.
+
+- **Functii:**  
+  Functii precum `send_ipv4_packet()` si `handle_ipv4_packet()`, incapsuleaza detalii despre construirea pachetului si decizia unde sa il trimita.
 
 ### router.hpp
 
-- **Data Structures:**  
-  - Defines custom structures for Ethernet frames, IPv4 packets, ARP packets, and ICMP packets.
-  - Provides a unified interface for packet access and manipulation.
-  
-- **Macros and Inline Helpers:**  
-  - Contains macros to easily access and modify headers (e.g., `get_eth_hdr`, `get_ipv4_hdr`, `get_arp_hdr`).
-  - Includes inline functions for operations such as calculating checksums, converting byte orders, and initializing header fields.
-  
-- **Interface Functions:**  
-  - Declares functions for sending Ethernet frames and constructing packets.
-  - Maintains global data structures like the ARP table (`arp_table_map`) and waiting queues (`waiting_packets`) for packet handling.
-  
-- **Integration:**  
-  - Facilitates interactions between lower-level packet processing and higher-level routing logic.
-  - Ensures that each packet is correctly processed and forwarded by unifying packet construction, parsing, and dispatch mechanisms.
+- **Structuri:**  
+  - Am dat multe typedef-uri si am facut wrappere pentru Ethernet frames, IPv4 packets, ARP packets, si ICMP packets.
+  - Am facut si API pentru pachete si header.
+
+- **Macro-uri si functii inline:**  
+  - Includem macro-uri (cum ar fi `get_eth_hdr`, `get_ipv4_hdr`, si `get_arp_hdr`) pentru a simplifica parsarea header-elor
+  - Contine functii inline pentru a da handle la task-uri ca checksum si byte-order conversions.
 
 ---
 
 ## How It Works
 
-1. **Routing Table Loading and Trie Building:**  
-   - The routing table is loaded into a dynamically allocated array.
-   - `build_trie()` constructs the trie after converting the routing table entries (IP prefixes, masks, etc.) from network (big-endian) format to host order.
-   - The global variable `trie_root` is updated, allowing for fast IP lookups.
+1. **Tria de rutare:**  
+   - Citim tabelul de rutare folosind functia din `lib.h`.
+   - `build_trie()` ne face o trie.  
+   - Pointer-ul global `trie_root` este folosit pentru IP lookups.
 
-2. **Packet Reception and Processing (router.cpp):**  
-   - The main loop retrieves incoming packets using `recv_from_any_link()`.
-   - Depending on the Ethernet type (IP or ARP), the packet is passed to the appropriate handler.
-   - **IPv4 Packet Handling:**
-     - Validates the IP header (checksum, TTL).
-     - If the packet is for forwarding, it determines the best route using the trie lookup.
-     - ARP resolution is performed if the next-hop MAC address is unknown.
-     - Constructs and sends ICMP error messages when needed.
-   - **ARP Packet Handling:**
-     - Processes ARP requests by sending replies.
-     - Updates the ARP table when ARP replies are received.
-     - Dequeues and processes pending packets waiting for ARP resolution.
-
-3. **Inter-module Communication:**  
-   - `router.hpp` provides all the necessary macros and helper routines, ensuring consistency in packet header handling across the project.
-   - The combination of `router.cpp` and `router.hpp` results in a modular router design that efficiently manages both packet forwarding and interface interactions.
+2. **Packet Reception and Handling:**  
+   - Bucla principala in `router.cpp` ia frame-uri de la `recv_from_any_link()`.
+   - In functie de ether_type din Ethernet frame (IP sau ARP packet), frame-ul este dus la handler-ul bun.
+     - Pentru **IPv4 packets**, router-ul verifica header-ul si da forward la pachet folosind trie lookup (dupa ARP resolution daca e nevoie) sau genereaza ICMP error daca pachetul nu poate fi forwardat.
+     - Pentru **ARP packets**, router-ul raspunde la ARP requests, updateaza ARP table dupa ce a primit replies, si proceseaza toate pachetele care asteapta un ARP entry.
 
 ---
 
-## Build & Test Instructions
-
-**Building the Project:**  
-   Ensure that all source files (`router.cpp`, `trie.hpp`, `router.hpp`, etc.) and the routing table for the routers (or more routing tables if you plan to use multiple of them) are in the same directory or correctly referenced. Compile the project using a the Makefile. For example: 
-   ```
-   make run_router0
-   make run_router1
-   ```
-
 ## Conclusion
-By leveraging a binary trie for longest prefix matching, this router efficiently determines the correct next hop for IP packets. The careful integration of `router.cpp` and `router.hpp` streamlines packet processing, ensuring accurate ARP handling, IP packet validation, and error messaging. This modular design allows for easy maintenance and potential future enhancements.
-
-
+Folosind o trie binara pentru LPM, router-ul poate sa identifice eficient next hop-ul pentru pachetele de IP.
