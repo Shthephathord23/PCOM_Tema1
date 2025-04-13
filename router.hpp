@@ -1,3 +1,9 @@
+#pragma once
+
+#ifndef __ROUTER_HPP__
+
+#define __ROUTER_HPP__
+
 #include "protocols.h"
 #include "lib.h"
 #include <arpa/inet.h>
@@ -38,46 +44,22 @@ struct mac_address
     uint8_t mac[6];
 };
 
-char* my_inet_ntoa(uint32_t ip)
+char *my_inet_ntoa(uint32_t ip)
 {
-	struct in_addr addr;
-	addr.s_addr = ip;
-	char* tmp = (char* )malloc(100);
-	memcpy(tmp, inet_ntoa(addr), 100);
-	return tmp;
+    struct in_addr addr;
+    addr.s_addr = ip;
+    char *tmp = (char *)malloc(100);
+    memcpy(tmp, inet_ntoa(addr), 100);
+    return tmp;
 }
 
 char *my_mac_ntoa(uint8_t *mac)
 {
-	static char mac_str[18];
-	sprintf(mac_str, "%02x:%02x:%02x:%02x:%02x:%02x", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
-	char* tmp = (char* )malloc(100);
-	memcpy(tmp, mac_str, 18);
-	return tmp;
-}
-
-route_table_entry *get_best_route_array(uint32_t ip_dest, std::array<route_table_entry, RTABLE_SIZE> &rtable_array)
-{
-    for (size_t i = 0; i < rtable_array.size(); i++)
-    {
-        if (rtable_array[i].prefix == (ip_dest & rtable_array[i].mask))
-        {
-            return &rtable_array[i];
-        }
-    }
-    return NULL;
-}
-
-arp_table_entry *get_arp_entry_array(uint32_t ip_dest, std::array<arp_table_entry, ARP_TABLE_SIZE> &arp_table_array)
-{
-    for (size_t i = 0; i < arp_table_array.size(); i++)
-    {
-        if (arp_table_array[i].ip == ip_dest)
-        {
-            return &arp_table_array[i];
-        }
-    }
-    return NULL;
+    static char mac_str[18];
+    sprintf(mac_str, "%02x:%02x:%02x:%02x:%02x:%02x", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+    char *tmp = (char *)malloc(100);
+    memcpy(tmp, mac_str, 18);
+    return tmp;
 }
 
 #define get_eth_hdr(x) ((ethernet_header *)(x)->buf)
@@ -100,12 +82,12 @@ arp_table_entry *get_arp_entry_array(uint32_t ip_dest, std::array<arp_table_entr
     } while (0)
 
 #define init_eth_hdr_broadcast(__x__, __src_addr__, __type__) \
-    do                                              \
-    {                                               \
-        ethernet_header *hdr = get_eth_hdr(__x__);  \
-        memcpy(hdr->ethr_shost, __src_addr__, 6);   \
-        memset(hdr->ethr_dhost, 0xFF, 6);           \
-        hdr->ethr_type = htons(__type__);     \
+    do                                                        \
+    {                                                         \
+        ethernet_header *hdr = get_eth_hdr(__x__);            \
+        memcpy(hdr->ethr_shost, __src_addr__, 6);             \
+        memset(hdr->ethr_dhost, 0xFF, 6);                     \
+        hdr->ethr_type = htons(__type__);                     \
     } while (0)
 
 struct ethernet_frame
@@ -115,7 +97,7 @@ struct ethernet_frame
     size_t length;
     size_t interface;
 
-    void send_to_mac(uint16_t type, uint8_t* src_mac, uint8_t* dest_mac, size_t interf)
+    inline void send_to_mac(uint16_t type, uint8_t *src_mac, uint8_t *dest_mac, size_t interf)
     {
         init_eth_hdr(this, src_mac, dest_mac, type);
         interface = interf;
@@ -126,7 +108,7 @@ struct ethernet_frame
         send_to_link(length, buf, interface);
     }
 
-    void send_to_broadcast(uint16_t type, uint8_t* src_mac, size_t interf)
+    inline void send_to_broadcast(uint16_t type, uint8_t *src_mac, size_t interf)
     {
         init_eth_hdr_broadcast(this, src_mac, type);
         interface = interf;
@@ -193,22 +175,12 @@ struct ipv4_packet
         return --ipv4_hdr->ttl > 0;
     }
 
-    inline route_table_entry *get_best_route(std::array<route_table_entry, RTABLE_SIZE> &rtable) const
-    {
-        return ::get_best_route_array(ipv4_hdr->dest_addr, rtable);
-    }
-
-    inline arp_table_entry *get_arp_entry(std::array<arp_table_entry, ARP_TABLE_SIZE> &arp_table) const
-    {
-        return ::get_arp_entry_array(ipv4_hdr->dest_addr, arp_table);
-    }
-
-    inline void send_to_route(route_table_entry* route, uint8_t* dest_mac)
+    inline void send_to_route(route_table_entry *route, uint8_t *dest_mac)
     {
         uint8_t src_mac[6] = {0};
         get_interface_mac(route->interface, src_mac);
 
-        reinterpret_cast<ethernet_frame* >(this)->send_to_mac(ETHER_TYPE_IP, src_mac, dest_mac, route->interface);
+        reinterpret_cast<ethernet_frame *>(this)->send_to_mac(ETHER_TYPE_IP, src_mac, dest_mac, route->interface);
     }
 };
 
@@ -242,25 +214,19 @@ struct icmp_packet
 
 #define get_arp_hdr(x) ((arp_header *)((char *)(x)->buf + sizeof(ethernet_header)))
 
-#define init_arp_hdr(__x__, __opcode__, __target_ip__) \
-    do                                                 \
-    {                                                  \
-        arp_header *hdr = get_arp_hdr(__x__);          \
-        hdr->hw_type = htons(HARDWARE_TYPE_ETHERNET);  \
-        hdr->proto_type = htons(PROTOCOL_TYPE_IP);     \
-        hdr->hw_len = HARDWARE_SIZE_ETHERNET;          \
-        hdr->proto_len = PROTOCOL_SIZE_IP;             \
-        hdr->opcode = htons(__opcode__);               \
-        memset(hdr->thwa, 0, hdr->hw_type);            \
-        hdr->tprotoa = __target_ip__;                  \
-    } while (0)
-
-#define arp_hdr_set_src(__x__, __src_mac__, __src_ip__)         \
-    do                                                          \
-    {                                                           \
-        arp_header *hdr = get_arp_hdr(__x__);                   \
-        memcpy(hdr->shwa, __src_mac__, HARDWARE_SIZE_ETHERNET); \
-        hdr->sprotoa = __src_ip__;                              \
+#define init_arp_hdr(__x__, __opcode__, __src_mac__, __src_ip__, __target_ip__) \
+    do                                                                          \
+    {                                                                           \
+        arp_header *hdr = get_arp_hdr(__x__);                                   \
+        hdr->hw_type = htons(HARDWARE_TYPE_ETHERNET);                           \
+        hdr->proto_type = htons(PROTOCOL_TYPE_IP);                              \
+        hdr->hw_len = HARDWARE_SIZE_ETHERNET;                                   \
+        hdr->proto_len = PROTOCOL_SIZE_IP;                                      \
+        hdr->opcode = htons(__opcode__);                                        \
+        hdr->sprotoa = __src_ip__;                                              \
+        memcpy(hdr->shwa, __src_mac__, HARDWARE_SIZE_ETHERNET);                 \
+        memset(hdr->thwa, 0, hdr->hw_type);                                     \
+        hdr->tprotoa = __target_ip__;                                           \
     } while (0)
 
 #define get_arp_hw_type(x) (&(get_arp_hdr(x)->hw_type))
@@ -280,3 +246,5 @@ struct arp_packet
     size_t length;
     size_t interface;
 };
+
+#endif
