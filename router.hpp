@@ -33,6 +33,11 @@ typedef ip_hdr ipv4_header;
 typedef arp_hdr arp_header;
 typedef icmp_hdr icmp_header;
 
+struct mac_address
+{
+    uint8_t mac[6];
+};
+
 char* my_inet_ntoa(uint32_t ip)
 {
 	struct in_addr addr;
@@ -94,13 +99,13 @@ arp_table_entry *get_arp_entry_array(uint32_t ip_dest, std::array<arp_table_entr
         hdr->ethr_type = htons(__type__);                         \
     } while (0)
 
-#define init_eth_hdr_broadcast(__x__, __src_addr__) \
+#define init_eth_hdr_broadcast(__x__, __src_addr__, __type__) \
     do                                              \
     {                                               \
         ethernet_header *hdr = get_eth_hdr(__x__);  \
         memcpy(hdr->ethr_shost, __src_addr__, 6);   \
         memset(hdr->ethr_dhost, 0xFF, 6);           \
-        hdr->ethr_type = htons(ETHER_TYPE_ARP);     \
+        hdr->ethr_type = htons(__type__);     \
     } while (0)
 
 struct ethernet_frame
@@ -113,6 +118,17 @@ struct ethernet_frame
     void send_to_mac(uint16_t type, uint8_t* src_mac, uint8_t* dest_mac, size_t interf)
     {
         init_eth_hdr(this, src_mac, dest_mac, type);
+        interface = interf;
+
+        printf("Bouta send EHT frame\n\tsrc_mac = %s dst_mac = %s\n",
+               my_mac_ntoa(get_eth_src_mac(this)), my_mac_ntoa(get_eth_dest_mac(this)));
+
+        send_to_link(length, buf, interface);
+    }
+
+    void send_to_broadcast(uint16_t type, uint8_t* src_mac, size_t interf)
+    {
+        init_eth_hdr_broadcast(this, src_mac, type);
         interface = interf;
 
         printf("Bouta send EHT frame\n\tsrc_mac = %s dst_mac = %s\n",
@@ -187,15 +203,12 @@ struct ipv4_packet
         return ::get_arp_entry_array(ipv4_hdr->dest_addr, arp_table);
     }
 
-    inline void send_to_route(route_table_entry *route, arp_table_entry *arp_entry)
+    inline void send_to_route(route_table_entry* route, uint8_t* dest_mac)
     {
         uint8_t src_mac[6] = {0};
         get_interface_mac(route->interface, src_mac);
 
-        reinterpret_cast<ethernet_frame* >(this)->send_to_mac(ETHER_TYPE_IP, src_mac, arp_entry->mac, route->interface);
-        // init_eth_hdr(this, src_mac, arp_entry->mac, ETHER_TYPE_IP);
-
-        // send_to_link(length, buf, route->interface);
+        reinterpret_cast<ethernet_frame* >(this)->send_to_mac(ETHER_TYPE_IP, src_mac, dest_mac, route->interface);
     }
 };
 

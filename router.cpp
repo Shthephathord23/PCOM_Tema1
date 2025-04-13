@@ -1,6 +1,6 @@
 #include "router.hpp"
 
-void send_arp_req(ipv4_packet* ipv4_packet, uint32_t dest_ip);
+void send_arp_req(uint32_t dest_ip, size_t non_interface);
 void handle_arp_packet(arp_packet* arp_packet);
 
 void send_ipv4_packet(ipv4_packet* ipv4_packet, bool drop_if_no_route);
@@ -15,8 +15,17 @@ size_t rtable_len;
 std::array<arp_table_entry, ARP_TABLE_SIZE> arp_table_array;
 size_t arp_table_len;
 
-std::unordered_map<uint32_t, uint8_t[6]> arp_table_map;
-std::unordered_map<uint32_t, std::queue<ethernet_frame>> waiting_packets;
+std::unordered_map<uint32_t, uint8_t*> arp_table_map;
+
+std::unordered_map<uint32_t, std::queue<ipv4_packet>> waiting_packets;
+
+void debug_waiting_packets() {
+    printf("Current waiting_packets contents:\n");
+    for (const auto& entry : waiting_packets) {
+        printf("  IP: %s (0x%x) - %zu packets waiting\n", 
+               my_inet_ntoa(entry.first), entry.first, entry.second.size());
+    }
+}
 
 bool cmp(route_table_entry& a, route_table_entry& b)
 {
@@ -26,27 +35,26 @@ bool cmp(route_table_entry& a, route_table_entry& b)
 	return a.mask > b.mask;
 }
 
-void send_arp_req(ipv4_packet* ipv4_packet, uint32_t dest_ip)
+void send_arp_req(uint32_t dest_ip, size_t non_interface)
 {
 	arp_packet arp_req;
 	memset(&arp_req, 0, sizeof(arp_packet));
 	arp_req.length = sizeof(ethernet_header) + sizeof(arp_header);
+
 	init_arp_hdr(&arp_req, ARP_REQUEST, dest_ip);
 
-	waiting_packets[dest_ip].push(*reinterpret_cast<ethernet_frame*>(ipv4_packet));
+	printf("Trimitem ARP BROADCAST request pentru %s\n", my_inet_ntoa(dest_ip));
 
 	for (size_t i = 0; i < ROUTER_NUM_INTERFACES; ++i)
 	{
-		if (i == *get_eth_interface(ipv4_packet))
+		if (i == non_interface)
 			continue;
 
 		uint8_t src_mac[6] = {0};
 		get_interface_mac(i, src_mac);
 		arp_hdr_set_src(&arp_req, src_mac, reinterpret_cast<uint32_t>(inet_addr(get_interface_ip(i))));
 
-		init_eth_hdr_broadcast(&arp_req, src_mac);
-
-		send_to_link(*get_eth_length(&arp_req), arp_req.buf, i);
+		reinterpret_cast<ethernet_frame* >(&arp_req)->send_to_broadcast(ETHER_TYPE_ARP, src_mac, i);
 	}
 }
 
@@ -85,78 +93,86 @@ void handle_arp_packet(arp_packet* arp_pkt)
 	uint16_t opcode = ntohs(*get_arp_opcode(arp_pkt));
 	switch (opcode)
 	{
-	case ARP_REQUEST:
-	{
-		printf("Am primit ARP request\n");
-		uint32_t dest_ip = *get_arp_dest_ip(arp_pkt);
-		uint8_t dest_mac[6] = {0};
-		uint32_t src_ip = *get_arp_src_ip(arp_pkt);
-		uint8_t src_mac[6] = {0};
-
-		printf("\tsrc_mac = %s src_ip = %s\n\tdest_mac = %s dest_ip = %s\n",
-			my_mac_ntoa(get_arp_src_mac(arp_pkt)), my_inet_ntoa(src_ip),
-			my_mac_ntoa(get_arp_dest_mac(arp_pkt)), my_inet_ntoa(dest_ip));
-
-		if (arp_table_map.find(dest_ip) != arp_table_map.end())
+		case ARP_REQUEST:
 		{
-			printf("Am gasit entry in ARP MAP\n");
-			send_arp_reply(arp_pkt);
-			return;
+			printf("Am primit ARP request\n");
+			printf("\tsrc_mac = %s src_ip = %s\n\tdest_mac = %s dest_ip = %s\n",
+				my_mac_ntoa(get_arp_src_mac(arp_pkt)), my_inet_ntoa(*get_arp_src_ip(arp_pkt)),
+				my_mac_ntoa(get_arp_dest_mac(arp_pkt)), my_inet_ntoa(*get_arp_dest_ip(arp_pkt)));
+
+			uint32_t dest_ip = *get_arp_dest_ip(arp_pkt);
+
+			if (arp_table_map.find(dest_ip) != arp_table_map.end())
+			{
+				printf("Am gasit entry in ARP MAP\n");
+				send_arp_reply(arp_pkt);
+				return;
+			}
+
+			// waiting_packets[dest_ip].push(*reinterpret_cast<ethernet_frame*>(arp_pkt));
+			
+			// if (waiting_packets[dest_ip].size() < 2)
+			// 	send_arp_req(dest_ip, *get_eth_interface(arp_pkt));
+			break;
+		}
+
+		case ARP_REPLY:
+		{
+			printf("Am primit ARP reply\n");
+			printf("\tsrc_mac = %s src_ip = %s\n\tdest_mac = %s dest_ip = %s\n",
+				my_mac_ntoa(get_arp_src_mac(arp_pkt)), my_inet_ntoa(*get_arp_src_ip(arp_pkt)),
+				my_mac_ntoa(get_arp_dest_mac(arp_pkt)), my_inet_ntoa(*get_arp_dest_ip(arp_pkt)));
+
+			uint32_t dest_ip = *get_arp_src_ip(arp_pkt);
+
+			arp_table_map[dest_ip] = (uint8_t*)malloc(6);
+			memcpy(arp_table_map[dest_ip], get_arp_src_mac(arp_pkt), 6);
+
+			printf("arp_table_map[%s] = %s\n", my_inet_ntoa(dest_ip), my_mac_ntoa(arp_table_map[dest_ip]));
+			debug_waiting_packets();
+			printf("Am gasit %zu entry in waiting_packets[%s]\n", waiting_packets[dest_ip].size(), my_inet_ntoa(dest_ip));
+
+			if (waiting_packets.find(dest_ip) != waiting_packets.end())
+			{
+				while (!waiting_packets[dest_ip].empty())
+				{
+					ipv4_packet* eth_frame = &waiting_packets[dest_ip].front();
+					uint16_t eth_type = ntohs(*get_eth_type(eth_frame));
+
+					switch (eth_type)
+					{
+						case ETHER_TYPE_IP:
+						{
+							ipv4_packet* packet_to_send = reinterpret_cast<ipv4_packet*>(eth_frame);
+							send_ipv4_packet(packet_to_send, false);
+							break;
+						}
+
+						case ETHER_TYPE_ARP:
+						{
+							printf("Trolaj imens\n");
+							arp_packet* arp_req = reinterpret_cast<arp_packet*>(eth_frame);
+							if (ntohs(*get_arp_opcode(arp_req)) == ARP_REQUEST)
+							{
+								send_arp_reply(arp_req);
+							}
+							break;
+						}
+
+						default:
+							break;
+					}
+
+					waiting_packets[dest_ip].pop();
+				}
+				waiting_packets.erase(dest_ip);
+			}
+			break;
 		}
 		
-		// send_arp_req(reinterpret_cast<ipv4_packet*>(arp_pkt), dest_ip);
-		break;
-	}
-	case ARP_REPLY:
-	{
-		printf("Am primit ARP reply\n");
-
-		uint32_t dest_ip = *get_arp_dest_ip(arp_pkt);
-		uint8_t dest_mac[6] = {0};
-		uint32_t src_ip = *get_arp_src_ip(arp_pkt);
-		uint8_t src_mac[6] = {0};
-
-		printf("\tsrc_mac = %s src_ip = %s\n\tdest_mac = %s dest_ip = %s\n",
-			my_mac_ntoa(get_arp_src_mac(arp_pkt)), my_inet_ntoa(src_ip),
-			my_mac_ntoa(get_arp_dest_mac(arp_pkt)), my_inet_ntoa(dest_ip));
-
-		memcpy(arp_table_map[dest_ip], get_arp_src_mac(arp_pkt), 6);
-
-		if (waiting_packets.find(dest_ip) != waiting_packets.end())
-		{
-			while (!waiting_packets[dest_ip].empty())
-			{
-				ethernet_frame* eth_frame = &waiting_packets[dest_ip].front();
-				uint16_t eth_type = ntohs(*get_eth_type(eth_frame));
-				switch (eth_type)
-				{
-				case ETHER_TYPE_IP:
-				{
-					ipv4_packet* packet_to_send = reinterpret_cast<ipv4_packet*>(eth_frame);
-					send_ipv4_packet(packet_to_send, false);
-					break;
-				}
-
-				case ETHER_TYPE_ARP:
-				{
-					arp_packet* arp_req = reinterpret_cast<arp_packet*>(eth_frame);
-					break;
-				}
-
-				default:
-					break;
-				}
-
-				waiting_packets[dest_ip].pop();
-			}
-			waiting_packets.erase(dest_ip);
-		}
-		break;
-	}
-	
-	default:
-		printf("Am primit un ARP invalid\n");
-		break;
+		default:
+			printf("Am primit un ARP invalid\n");
+			break;
 	}
 }
 
@@ -175,16 +191,32 @@ void send_ipv4_packet(ipv4_packet* ipv4_packet, bool drop_if_no_route)
 	printf("%p %s %s %s %s\n", best_route, my_inet_ntoa(best_route->prefix), my_inet_ntoa(best_route->next_hop), my_inet_ntoa(best_route->mask), get_interface_ip(best_route->interface));
 	printf("Am gasit ruta si next-hop este %s\n", my_inet_ntoa(best_route->next_hop));
 
-	arp_table_entry* arp_entry = get_arp_entry_array(best_route->next_hop, arp_table_array);
-	if (arp_entry == NULL)
+	// arp_table_entry* arp_entry = get_arp_entry_array(best_route->next_hop, arp_table_array);
+	// if (arp_entry == NULL)
+	// {
+	// 	printf("Nu am gasit entry in ARP\n");
+	// 	return;
+	// }
+
+	if (arp_table_map.find(best_route->next_hop) == arp_table_map.end())
 	{
-		printf("Nu am gasit entry in ARP\n");
+		printf("Nu am gasit entry in ARP MAP\n");
+
+		ethernet_frame eth_copy;
+		memcpy(&eth_copy, ipv4_packet, sizeof(ethernet_frame));
+		waiting_packets[best_route->next_hop].push(*ipv4_packet);
+
+		debug_waiting_packets();
+		printf("Am gasit %zu entry in waiting_packetsl la ip = %s\n", waiting_packets[best_route->next_hop].size(), my_inet_ntoa(best_route->next_hop));
+
+		if (waiting_packets[best_route->next_hop].size() < 2)
+			send_arp_req(best_route->next_hop, ipv4_packet->interface);
+
 		return;
 	}
 
-	ipv4_packet->send_to_route(best_route, arp_entry);
-
-	printf("Am gasit entry in ARP, src = %s dst = %s\n", my_mac_ntoa(get_eth_src_mac(ipv4_packet)), my_mac_ntoa(arp_entry->mac));
+	// ipv4_packet->send_to_route(best_route, arp_entry->mac);
+	ipv4_packet->send_to_route(best_route, arp_table_map[best_route->next_hop]);
 }
 
 void handle_icmp(ipv4_packet* recieved_packet, icmp_packet* icmp_response, size_t length,
@@ -293,6 +325,7 @@ int main(int argc, char *argv[])
 		uint8_t src_mac[6] = {0};
 		get_interface_mac(i, src_mac);
 		uint32_t src_ip = reinterpret_cast<uint32_t>(inet_addr(get_interface_ip(i)));
+		arp_table_map[src_ip] = (uint8_t*)malloc(6);
 		memcpy(arp_table_map[src_ip], src_mac, 6);
 	}
 
@@ -340,4 +373,8 @@ int main(int argc, char *argv[])
 	}
 	free(rtable);
 	free(arp_table);
+	for (auto& entry : arp_table_map)
+	{
+		free(entry.second);
+	}
 }

@@ -1,6 +1,0 @@
-  File "/root/UPB/PCOM/Tema 1/./checker/checker.py", line 38, in passive
-    status = fn(testname, packets)
-             ^^^^^^^^^^^^^^^^^^^^^
-  File "/root/UPB/PCOM/Tema 1/checker/tests.py", line 257, in router_arp_request_p
-    assert ARP in packets[0], "No ARP request!"
-           ^^^^^^^^^^^^^^^^^
