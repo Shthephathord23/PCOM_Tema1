@@ -13,8 +13,10 @@ Avem checksum bun
 TTL este 62
 interfata mea este 0 ip-ul meu 192.0.1.2
 Sursa este 192.168.0.2, iar destinatia este 192.168.3.2
-0x55f0ff2c5160 192.168.3.0 192.168.3.2 255.255.255.0 192.168.3.0
+0x56363b3131c0 192.168.3.0 192.168.3.2 255.255.255.0 192.168.3.0
 Am gasit ruta si next-hop este 192.168.3.2
+Bouta send EHT frame
+	src_mac = de:fe:c8:ed:01:03 dst_mac = de:ad:be:ef:00:03
 Am gasit entry in ARP, src = de:fe:c8:ed:01:03 dst = de:ad:be:ef:00:03
 
 
@@ -22,25 +24,39 @@ router 2
 Am primit frame cu src = de:ad:be:ef:00:03 si dest = ff:ff:ff:ff:ff:ff
 de tip = 806 si lungime = 42
 Am primit ARP packet
+Am primit ARP request
+	src_mac = de:ad:be:ef:00:03 src_ip = 192.168.3.2
+	dest_mac = 00:00:00:00:00:00 dest_ip = 192.168.3.1
+Am gasit entry in ARP MAP
+Bouta send ARP packet
+	src_mac = de:fe:c8:ed:01:03 src_ip = 192.168.3.1
+	dest_mac = de:ad:be:ef:00:03 dest_ip = 192.168.3.2
+Bouta send EHT frame
+	src_mac = de:fe:c8:ed:01:03 dst_mac = de:ad:be:ef:00:03
 
 
 router 3
 Am primit frame cu src = de:fe:c8:ed:01:03 si dest = de:ad:be:ef:00:03
 de tip = 806 si lungime = 42
 Am primit ARP packet
+Am primit ARP reply
+	src_mac = de:fe:c8:ed:01:03 src_ip = 192.168.3.1
+	dest_mac = de:ad:be:ef:00:03 dest_ip = 192.168.3.2
 
 
 router 4
 Am primit frame cu src = de:ad:be:ef:00:03 si dest = de:fe:c8:ed:01:03
 de tip = 800 si lungime = 62
 Am primit IP packet
-Checksum: d4f8 d4f8
+Checksum: d0f1 d0f1
 Avem checksum bun
 TTL este 63
 interfata mea este 2 ip-ul meu 192.168.3.1
 Sursa este 192.168.3.2, iar destinatia este 192.168.0.2
-0x55f0ff2c5130 192.168.0.0 192.0.1.1 255.255.255.0 192.168.0.0
+0x56363b313190 192.168.0.0 192.0.1.1 255.255.255.0 192.168.0.0
 Am gasit ruta si next-hop este 192.0.1.1
+Bouta send EHT frame
+	src_mac = ca:fe:ba:be:01:00 dst_mac = ca:fe:ba:be:00:01
 Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = ca:fe:ba:be:00:01
 
 
@@ -53,8 +69,10 @@ Avem checksum bun
 TTL este 63
 interfata mea este 1 ip-ul meu 192.168.2.1
 Sursa este 192.168.2.2, iar destinatia este 192.168.0.2
-0x55f0ff2c5130 192.168.0.0 192.0.1.1 255.255.255.0 192.168.0.0
+0x56363b313190 192.168.0.0 192.0.1.1 255.255.255.0 192.168.0.0
 Am gasit ruta si next-hop este 192.0.1.1
+Bouta send EHT frame
+	src_mac = ca:fe:ba:be:01:00 dst_mac = ca:fe:ba:be:00:01
 Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = ca:fe:ba:be:00:01
 
 
@@ -62,13 +80,15 @@ router 6
 Am primit frame cu src = ca:fe:ba:be:00:01 si dest = ca:fe:ba:be:01:00
 de tip = 800 si lungime = 62
 Am primit IP packet
-Checksum: ae3c ae3c
+Checksum: 77fe 77fe
 Avem checksum bun
 TTL este 62
 interfata mea este 0 ip-ul meu 192.0.1.2
 Sursa este 192.168.0.2, iar destinatia este 192.168.2.2
-0x55f0ff2c5150 192.168.2.0 192.168.2.2 255.255.255.0 192.168.2.0
+0x56363b3131b0 192.168.2.0 192.168.2.2 255.255.255.0 192.168.2.0
 Am gasit ruta si next-hop este 192.168.2.2
+Bouta send EHT frame
+	src_mac = de:fe:c8:ed:01:02 dst_mac = de:ad:be:ef:00:02
 Am gasit entry in ARP, src = de:fe:c8:ed:01:02 dst = de:ad:be:ef:00:02
 
 
@@ -81,8 +101,10 @@ Avem checksum bun
 TTL este 63
 interfata mea este 1 ip-ul meu 192.168.2.1
 Sursa este 192.168.2.2, iar destinatia este 192.168.1.2
-0x55f0ff2c5140 192.168.1.0 192.0.1.1 255.255.255.0 192.168.1.0
+0x56363b3131a0 192.168.1.0 192.0.1.1 255.255.255.0 192.168.1.0
 Am gasit ruta si next-hop este 192.0.1.1
+Bouta send EHT frame
+	src_mac = ca:fe:ba:be:01:00 dst_mac = ca:fe:ba:be:00:01
 Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = ca:fe:ba:be:00:01
 
 
@@ -90,13 +112,15 @@ router 8
 Am primit frame cu src = ca:fe:ba:be:00:01 si dest = ca:fe:ba:be:01:00
 de tip = 800 si lungime = 62
 Am primit IP packet
-Checksum: 5d98 5d98
+Checksum: 80a9 80a9
 Avem checksum bun
 TTL este 62
 interfata mea este 0 ip-ul meu 192.0.1.2
 Sursa este 192.168.1.2, iar destinatia este 192.168.2.2
-0x55f0ff2c5150 192.168.2.0 192.168.2.2 255.255.255.0 192.168.2.0
+0x56363b3131b0 192.168.2.0 192.168.2.2 255.255.255.0 192.168.2.0
 Am gasit ruta si next-hop este 192.168.2.2
+Bouta send EHT frame
+	src_mac = de:fe:c8:ed:01:02 dst_mac = de:ad:be:ef:00:02
 Am gasit entry in ARP, src = de:fe:c8:ed:01:02 dst = de:ad:be:ef:00:02
 
 
@@ -109,8 +133,10 @@ Avem checksum bun
 TTL este 63
 interfata mea este 1 ip-ul meu 192.168.2.1
 Sursa este 192.168.2.2, iar destinatia este 192.168.3.2
-0x55f0ff2c5160 192.168.3.0 192.168.3.2 255.255.255.0 192.168.3.0
+0x56363b3131c0 192.168.3.0 192.168.3.2 255.255.255.0 192.168.3.0
 Am gasit ruta si next-hop este 192.168.3.2
+Bouta send EHT frame
+	src_mac = de:fe:c8:ed:01:03 dst_mac = de:ad:be:ef:00:03
 Am gasit entry in ARP, src = de:fe:c8:ed:01:03 dst = de:ad:be:ef:00:03
 
 
@@ -118,13 +144,15 @@ router 10
 Am primit frame cu src = de:ad:be:ef:00:03 si dest = de:fe:c8:ed:01:03
 de tip = 800 si lungime = 62
 Am primit IP packet
-Checksum: db5c db5c
+Checksum: d0ea d0ea
 Avem checksum bun
 TTL este 63
 interfata mea este 2 ip-ul meu 192.168.3.1
 Sursa este 192.168.3.2, iar destinatia este 192.168.2.2
-0x55f0ff2c5150 192.168.2.0 192.168.2.2 255.255.255.0 192.168.2.0
+0x56363b3131b0 192.168.2.0 192.168.2.2 255.255.255.0 192.168.2.0
 Am gasit ruta si next-hop este 192.168.2.2
+Bouta send EHT frame
+	src_mac = de:fe:c8:ed:01:02 dst_mac = de:ad:be:ef:00:02
 Am gasit entry in ARP, src = de:fe:c8:ed:01:02 dst = de:ad:be:ef:00:02
 
 
@@ -132,12 +160,24 @@ router 11
 Am primit frame cu src = de:ad:be:ef:00:03 si dest = de:fe:c8:ed:01:03
 de tip = 806 si lungime = 42
 Am primit ARP packet
+Am primit ARP request
+	src_mac = de:ad:be:ef:00:03 src_ip = 192.168.3.2
+	dest_mac = 00:00:00:00:00:00 dest_ip = 192.168.3.1
+Am gasit entry in ARP MAP
+Bouta send ARP packet
+	src_mac = de:fe:c8:ed:01:03 src_ip = 192.168.3.1
+	dest_mac = de:ad:be:ef:00:03 dest_ip = 192.168.3.2
+Bouta send EHT frame
+	src_mac = de:fe:c8:ed:01:03 dst_mac = de:ad:be:ef:00:03
 
 
 router 12
 Am primit frame cu src = de:fe:c8:ed:01:03 si dest = de:ad:be:ef:00:03
 de tip = 806 si lungime = 42
 Am primit ARP packet
+Am primit ARP reply
+	src_mac = de:fe:c8:ed:01:03 src_ip = 192.168.3.1
+	dest_mac = de:ad:be:ef:00:03 dest_ip = 192.168.3.2
 
 
 router 13
@@ -149,8 +189,10 @@ Avem checksum bun
 TTL este 63
 interfata mea este 2 ip-ul meu 192.168.3.1
 Sursa este 192.168.3.2, iar destinatia este 192.168.1.2
-0x55f0ff2c5140 192.168.1.0 192.0.1.1 255.255.255.0 192.168.1.0
+0x56363b3131a0 192.168.1.0 192.0.1.1 255.255.255.0 192.168.1.0
 Am gasit ruta si next-hop este 192.0.1.1
+Bouta send EHT frame
+	src_mac = ca:fe:ba:be:01:00 dst_mac = ca:fe:ba:be:00:01
 Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = ca:fe:ba:be:00:01
 
 
@@ -158,13 +200,15 @@ router 14
 Am primit frame cu src = ca:fe:ba:be:00:01 si dest = ca:fe:ba:be:01:00
 de tip = 800 si lungime = 62
 Am primit IP packet
-Checksum: 24fb 24fb
+Checksum: 5ead 5ead
 Avem checksum bun
 TTL este 62
 interfata mea este 0 ip-ul meu 192.0.1.2
 Sursa este 192.168.1.2, iar destinatia este 192.168.3.2
-0x55f0ff2c5160 192.168.3.0 192.168.3.2 255.255.255.0 192.168.3.0
+0x56363b3131c0 192.168.3.0 192.168.3.2 255.255.255.0 192.168.3.0
 Am gasit ruta si next-hop este 192.168.3.2
+Bouta send EHT frame
+	src_mac = de:fe:c8:ed:01:03 dst_mac = de:ad:be:ef:00:03
 Am gasit entry in ARP, src = de:fe:c8:ed:01:03 dst = de:ad:be:ef:00:03
 
 
@@ -177,8 +221,10 @@ Avem checksum bun
 TTL este 62
 interfata mea este 0 ip-ul meu 192.0.1.2
 Sursa este 192.168.0.2, iar destinatia este 192.168.3.2
-0x55f0ff2c5160 192.168.3.0 192.168.3.2 255.255.255.0 192.168.3.0
+0x56363b3131c0 192.168.3.0 192.168.3.2 255.255.255.0 192.168.3.0
 Am gasit ruta si next-hop este 192.168.3.2
+Bouta send EHT frame
+	src_mac = de:fe:c8:ed:01:03 dst_mac = de:ad:be:ef:00:03
 Am gasit entry in ARP, src = de:fe:c8:ed:01:03 dst = de:ad:be:ef:00:03
 
 
@@ -186,13 +232,15 @@ router 16
 Am primit frame cu src = de:ad:be:ef:00:03 si dest = de:fe:c8:ed:01:03
 de tip = 800 si lungime = 42
 Am primit IP packet
-Checksum: d25f d25f
+Checksum: 8f49 8f49
 Avem checksum bun
 TTL este 63
 interfata mea este 2 ip-ul meu 192.168.3.1
 Sursa este 192.168.3.2, iar destinatia este 192.168.0.2
-0x55f0ff2c5130 192.168.0.0 192.0.1.1 255.255.255.0 192.168.0.0
+0x56363b313190 192.168.0.0 192.0.1.1 255.255.255.0 192.168.0.0
 Am gasit ruta si next-hop este 192.0.1.1
+Bouta send EHT frame
+	src_mac = ca:fe:ba:be:01:00 dst_mac = ca:fe:ba:be:00:01
 Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = ca:fe:ba:be:00:01
 
 
@@ -205,8 +253,10 @@ Avem checksum bun
 TTL este 62
 interfata mea este 0 ip-ul meu 192.0.1.2
 Sursa este 192.168.0.2, iar destinatia este 192.168.3.2
-0x55f0ff2c5160 192.168.3.0 192.168.3.2 255.255.255.0 192.168.3.0
+0x56363b3131c0 192.168.3.0 192.168.3.2 255.255.255.0 192.168.3.0
 Am gasit ruta si next-hop este 192.168.3.2
+Bouta send EHT frame
+	src_mac = de:fe:c8:ed:01:03 dst_mac = de:ad:be:ef:00:03
 Am gasit entry in ARP, src = de:fe:c8:ed:01:03 dst = de:ad:be:ef:00:03
 
 
@@ -214,13 +264,15 @@ router 18
 Am primit frame cu src = de:ad:be:ef:00:03 si dest = de:fe:c8:ed:01:03
 de tip = 800 si lungime = 42
 Am primit IP packet
-Checksum: cd5f cd5f
+Checksum: 8549 8549
 Avem checksum bun
 TTL este 63
 interfata mea este 2 ip-ul meu 192.168.3.1
 Sursa este 192.168.3.2, iar destinatia este 192.168.0.2
-0x55f0ff2c5130 192.168.0.0 192.0.1.1 255.255.255.0 192.168.0.0
+0x56363b313190 192.168.0.0 192.0.1.1 255.255.255.0 192.168.0.0
 Am gasit ruta si next-hop este 192.0.1.1
+Bouta send EHT frame
+	src_mac = ca:fe:ba:be:01:00 dst_mac = ca:fe:ba:be:00:01
 Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = ca:fe:ba:be:00:01
 
 
@@ -233,8 +285,10 @@ Avem checksum bun
 TTL este 62
 interfata mea este 0 ip-ul meu 192.0.1.2
 Sursa este 192.168.0.2, iar destinatia este 192.168.3.2
-0x55f0ff2c5160 192.168.3.0 192.168.3.2 255.255.255.0 192.168.3.0
+0x56363b3131c0 192.168.3.0 192.168.3.2 255.255.255.0 192.168.3.0
 Am gasit ruta si next-hop este 192.168.3.2
+Bouta send EHT frame
+	src_mac = de:fe:c8:ed:01:03 dst_mac = de:ad:be:ef:00:03
 Am gasit entry in ARP, src = de:fe:c8:ed:01:03 dst = de:ad:be:ef:00:03
 
 
@@ -242,13 +296,15 @@ router 20
 Am primit frame cu src = de:ad:be:ef:00:03 si dest = de:fe:c8:ed:01:03
 de tip = 800 si lungime = 42
 Am primit IP packet
-Checksum: c75f c75f
+Checksum: 7c49 7c49
 Avem checksum bun
 TTL este 63
 interfata mea este 2 ip-ul meu 192.168.3.1
 Sursa este 192.168.3.2, iar destinatia este 192.168.0.2
-0x55f0ff2c5130 192.168.0.0 192.0.1.1 255.255.255.0 192.168.0.0
+0x56363b313190 192.168.0.0 192.0.1.1 255.255.255.0 192.168.0.0
 Am gasit ruta si next-hop este 192.0.1.1
+Bouta send EHT frame
+	src_mac = ca:fe:ba:be:01:00 dst_mac = ca:fe:ba:be:00:01
 Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = ca:fe:ba:be:00:01
 
 
@@ -261,8 +317,10 @@ Avem checksum bun
 TTL este 62
 interfata mea este 0 ip-ul meu 192.0.1.2
 Sursa este 192.168.0.2, iar destinatia este 192.168.3.2
-0x55f0ff2c5160 192.168.3.0 192.168.3.2 255.255.255.0 192.168.3.0
+0x56363b3131c0 192.168.3.0 192.168.3.2 255.255.255.0 192.168.3.0
 Am gasit ruta si next-hop este 192.168.3.2
+Bouta send EHT frame
+	src_mac = de:fe:c8:ed:01:03 dst_mac = de:ad:be:ef:00:03
 Am gasit entry in ARP, src = de:fe:c8:ed:01:03 dst = de:ad:be:ef:00:03
 
 
@@ -270,13 +328,15 @@ router 22
 Am primit frame cu src = de:ad:be:ef:00:03 si dest = de:fe:c8:ed:01:03
 de tip = 800 si lungime = 42
 Am primit IP packet
-Checksum: c35f c35f
+Checksum: 7a49 7a49
 Avem checksum bun
 TTL este 63
 interfata mea este 2 ip-ul meu 192.168.3.1
 Sursa este 192.168.3.2, iar destinatia este 192.168.0.2
-0x55f0ff2c5130 192.168.0.0 192.0.1.1 255.255.255.0 192.168.0.0
+0x56363b313190 192.168.0.0 192.0.1.1 255.255.255.0 192.168.0.0
 Am gasit ruta si next-hop este 192.0.1.1
+Bouta send EHT frame
+	src_mac = ca:fe:ba:be:01:00 dst_mac = ca:fe:ba:be:00:01
 Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = ca:fe:ba:be:00:01
 
 
@@ -289,8 +349,10 @@ Avem checksum bun
 TTL este 62
 interfata mea este 0 ip-ul meu 192.0.1.2
 Sursa este 192.168.0.2, iar destinatia este 192.168.3.2
-0x55f0ff2c5160 192.168.3.0 192.168.3.2 255.255.255.0 192.168.3.0
+0x56363b3131c0 192.168.3.0 192.168.3.2 255.255.255.0 192.168.3.0
 Am gasit ruta si next-hop este 192.168.3.2
+Bouta send EHT frame
+	src_mac = de:fe:c8:ed:01:03 dst_mac = de:ad:be:ef:00:03
 Am gasit entry in ARP, src = de:fe:c8:ed:01:03 dst = de:ad:be:ef:00:03
 
 
@@ -298,13 +360,15 @@ router 24
 Am primit frame cu src = de:ad:be:ef:00:03 si dest = de:fe:c8:ed:01:03
 de tip = 800 si lungime = 42
 Am primit IP packet
-Checksum: bc5f bc5f
+Checksum: 7649 7649
 Avem checksum bun
 TTL este 63
 interfata mea este 2 ip-ul meu 192.168.3.1
 Sursa este 192.168.3.2, iar destinatia este 192.168.0.2
-0x55f0ff2c5130 192.168.0.0 192.0.1.1 255.255.255.0 192.168.0.0
+0x56363b313190 192.168.0.0 192.0.1.1 255.255.255.0 192.168.0.0
 Am gasit ruta si next-hop este 192.0.1.1
+Bouta send EHT frame
+	src_mac = ca:fe:ba:be:01:00 dst_mac = ca:fe:ba:be:00:01
 Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = ca:fe:ba:be:00:01
 
 
@@ -317,8 +381,10 @@ Avem checksum bun
 TTL este 62
 interfata mea este 0 ip-ul meu 192.0.1.2
 Sursa este 192.168.0.2, iar destinatia este 192.168.3.2
-0x55f0ff2c5160 192.168.3.0 192.168.3.2 255.255.255.0 192.168.3.0
+0x56363b3131c0 192.168.3.0 192.168.3.2 255.255.255.0 192.168.3.0
 Am gasit ruta si next-hop este 192.168.3.2
+Bouta send EHT frame
+	src_mac = de:fe:c8:ed:01:03 dst_mac = de:ad:be:ef:00:03
 Am gasit entry in ARP, src = de:fe:c8:ed:01:03 dst = de:ad:be:ef:00:03
 
 
@@ -326,13 +392,15 @@ router 26
 Am primit frame cu src = de:ad:be:ef:00:03 si dest = de:fe:c8:ed:01:03
 de tip = 800 si lungime = 42
 Am primit IP packet
-Checksum: b55f b55f
+Checksum: 7049 7049
 Avem checksum bun
 TTL este 63
 interfata mea este 2 ip-ul meu 192.168.3.1
 Sursa este 192.168.3.2, iar destinatia este 192.168.0.2
-0x55f0ff2c5130 192.168.0.0 192.0.1.1 255.255.255.0 192.168.0.0
+0x56363b313190 192.168.0.0 192.0.1.1 255.255.255.0 192.168.0.0
 Am gasit ruta si next-hop este 192.0.1.1
+Bouta send EHT frame
+	src_mac = ca:fe:ba:be:01:00 dst_mac = ca:fe:ba:be:00:01
 Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = ca:fe:ba:be:00:01
 
 
@@ -345,8 +413,10 @@ Avem checksum bun
 TTL este 62
 interfata mea este 0 ip-ul meu 192.0.1.2
 Sursa este 192.168.0.2, iar destinatia este 192.168.3.2
-0x55f0ff2c5160 192.168.3.0 192.168.3.2 255.255.255.0 192.168.3.0
+0x56363b3131c0 192.168.3.0 192.168.3.2 255.255.255.0 192.168.3.0
 Am gasit ruta si next-hop este 192.168.3.2
+Bouta send EHT frame
+	src_mac = de:fe:c8:ed:01:03 dst_mac = de:ad:be:ef:00:03
 Am gasit entry in ARP, src = de:fe:c8:ed:01:03 dst = de:ad:be:ef:00:03
 
 
@@ -354,13 +424,15 @@ router 28
 Am primit frame cu src = de:ad:be:ef:00:03 si dest = de:fe:c8:ed:01:03
 de tip = 800 si lungime = 42
 Am primit IP packet
-Checksum: b05f b05f
+Checksum: 6c49 6c49
 Avem checksum bun
 TTL este 63
 interfata mea este 2 ip-ul meu 192.168.3.1
 Sursa este 192.168.3.2, iar destinatia este 192.168.0.2
-0x55f0ff2c5130 192.168.0.0 192.0.1.1 255.255.255.0 192.168.0.0
+0x56363b313190 192.168.0.0 192.0.1.1 255.255.255.0 192.168.0.0
 Am gasit ruta si next-hop este 192.0.1.1
+Bouta send EHT frame
+	src_mac = ca:fe:ba:be:01:00 dst_mac = ca:fe:ba:be:00:01
 Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = ca:fe:ba:be:00:01
 
 
@@ -373,8 +445,10 @@ Avem checksum bun
 TTL este 62
 interfata mea este 0 ip-ul meu 192.0.1.2
 Sursa este 192.168.0.2, iar destinatia este 192.168.3.2
-0x55f0ff2c5160 192.168.3.0 192.168.3.2 255.255.255.0 192.168.3.0
+0x56363b3131c0 192.168.3.0 192.168.3.2 255.255.255.0 192.168.3.0
 Am gasit ruta si next-hop este 192.168.3.2
+Bouta send EHT frame
+	src_mac = de:fe:c8:ed:01:03 dst_mac = de:ad:be:ef:00:03
 Am gasit entry in ARP, src = de:fe:c8:ed:01:03 dst = de:ad:be:ef:00:03
 
 
@@ -382,13 +456,15 @@ router 30
 Am primit frame cu src = de:ad:be:ef:00:03 si dest = de:fe:c8:ed:01:03
 de tip = 800 si lungime = 42
 Am primit IP packet
-Checksum: a65f a65f
+Checksum: 6b49 6b49
 Avem checksum bun
 TTL este 63
 interfata mea este 2 ip-ul meu 192.168.3.1
 Sursa este 192.168.3.2, iar destinatia este 192.168.0.2
-0x55f0ff2c5130 192.168.0.0 192.0.1.1 255.255.255.0 192.168.0.0
+0x56363b313190 192.168.0.0 192.0.1.1 255.255.255.0 192.168.0.0
 Am gasit ruta si next-hop este 192.0.1.1
+Bouta send EHT frame
+	src_mac = ca:fe:ba:be:01:00 dst_mac = ca:fe:ba:be:00:01
 Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = ca:fe:ba:be:00:01
 
 
@@ -401,8 +477,10 @@ Avem checksum bun
 TTL este 62
 interfata mea este 0 ip-ul meu 192.0.1.2
 Sursa este 192.168.0.2, iar destinatia este 192.168.3.2
-0x55f0ff2c5160 192.168.3.0 192.168.3.2 255.255.255.0 192.168.3.0
+0x56363b3131c0 192.168.3.0 192.168.3.2 255.255.255.0 192.168.3.0
 Am gasit ruta si next-hop este 192.168.3.2
+Bouta send EHT frame
+	src_mac = de:fe:c8:ed:01:03 dst_mac = de:ad:be:ef:00:03
 Am gasit entry in ARP, src = de:fe:c8:ed:01:03 dst = de:ad:be:ef:00:03
 
 
@@ -410,13 +488,15 @@ router 32
 Am primit frame cu src = de:ad:be:ef:00:03 si dest = de:fe:c8:ed:01:03
 de tip = 800 si lungime = 42
 Am primit IP packet
-Checksum: a05f a05f
+Checksum: 6949 6949
 Avem checksum bun
 TTL este 63
 interfata mea este 2 ip-ul meu 192.168.3.1
 Sursa este 192.168.3.2, iar destinatia este 192.168.0.2
-0x55f0ff2c5130 192.168.0.0 192.0.1.1 255.255.255.0 192.168.0.0
+0x56363b313190 192.168.0.0 192.0.1.1 255.255.255.0 192.168.0.0
 Am gasit ruta si next-hop este 192.0.1.1
+Bouta send EHT frame
+	src_mac = ca:fe:ba:be:01:00 dst_mac = ca:fe:ba:be:00:01
 Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = ca:fe:ba:be:00:01
 
 
@@ -429,8 +509,10 @@ Avem checksum bun
 TTL este 62
 interfata mea este 0 ip-ul meu 192.0.1.2
 Sursa este 192.168.0.2, iar destinatia este 192.168.3.2
-0x55f0ff2c5160 192.168.3.0 192.168.3.2 255.255.255.0 192.168.3.0
+0x56363b3131c0 192.168.3.0 192.168.3.2 255.255.255.0 192.168.3.0
 Am gasit ruta si next-hop este 192.168.3.2
+Bouta send EHT frame
+	src_mac = de:fe:c8:ed:01:03 dst_mac = de:ad:be:ef:00:03
 Am gasit entry in ARP, src = de:fe:c8:ed:01:03 dst = de:ad:be:ef:00:03
 
 
@@ -438,13 +520,15 @@ router 34
 Am primit frame cu src = de:ad:be:ef:00:03 si dest = de:fe:c8:ed:01:03
 de tip = 800 si lungime = 42
 Am primit IP packet
-Checksum: 9f5f 9f5f
+Checksum: 6749 6749
 Avem checksum bun
 TTL este 63
 interfata mea este 2 ip-ul meu 192.168.3.1
 Sursa este 192.168.3.2, iar destinatia este 192.168.0.2
-0x55f0ff2c5130 192.168.0.0 192.0.1.1 255.255.255.0 192.168.0.0
+0x56363b313190 192.168.0.0 192.0.1.1 255.255.255.0 192.168.0.0
 Am gasit ruta si next-hop este 192.0.1.1
+Bouta send EHT frame
+	src_mac = ca:fe:ba:be:01:00 dst_mac = ca:fe:ba:be:00:01
 Am gasit entry in ARP, src = ca:fe:ba:be:01:00 dst = ca:fe:ba:be:00:01
 
 
@@ -452,9 +536,21 @@ router 35
 Am primit frame cu src = de:ad:be:ef:00:03 si dest = de:fe:c8:ed:01:03
 de tip = 806 si lungime = 42
 Am primit ARP packet
+Am primit ARP request
+	src_mac = de:ad:be:ef:00:03 src_ip = 192.168.3.2
+	dest_mac = 00:00:00:00:00:00 dest_ip = 192.168.3.1
+Am gasit entry in ARP MAP
+Bouta send ARP packet
+	src_mac = de:fe:c8:ed:01:03 src_ip = 192.168.3.1
+	dest_mac = de:ad:be:ef:00:03 dest_ip = 192.168.3.2
+Bouta send EHT frame
+	src_mac = de:fe:c8:ed:01:03 dst_mac = de:ad:be:ef:00:03
 
 
 router 36
 Am primit frame cu src = de:fe:c8:ed:01:03 si dest = de:ad:be:ef:00:03
 de tip = 806 si lungime = 42
 Am primit ARP packet
+Am primit ARP reply
+	src_mac = de:fe:c8:ed:01:03 src_ip = 192.168.3.1
+	dest_mac = de:ad:be:ef:00:03 dest_ip = 192.168.3.2

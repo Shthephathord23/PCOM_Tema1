@@ -4,7 +4,7 @@ LIBRARY=nope
 INCPATHS=include
 LIBPATHS=.
 LDFLAGS=
-CFLAGS=-c -Wall -Werror -Wno-error=unused-variable
+CFLAGS=-c -Wall -Werror -Wno-error=unused-variable -ggdb
 CC=g++
 
 # Automatic generation of some important lists
@@ -31,3 +31,9 @@ run_router0: all
 
 run_router1: all
 	./router rtable1.txt rr-0-1 r-0 r-1
+
+gr1: all
+	gdb ./router rtable0.txt rr-0-1 r-0 r-1
+
+gr2: all
+	gdb ./router rtable1.txt rr-0-1 r-0 r-1
